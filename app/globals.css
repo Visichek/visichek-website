@@ -1,0 +1,531 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-200: #bbf7d0;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-charcoal: #2a2a2a;
+  --color-charcoal-light: #4a4a4a;
+  --color-charcoal-lighter: #6a6a6a;
+  --color-offwhite: #ffffff;
+  --color-border: #e8e8e8;
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-marketing-sans: var(--font-twk-lausanne), "twkLausanne", ui-sans-serif, system-ui, sans-serif;
+  --font-marketing-serif: var(--font-moderat-serif), "moderatSerif", ui-serif, Georgia, serif;
+  --font-marketing-mono: var(--font-sf-mono), "sfMono", ui-monospace, monospace;
+  --font-marketing-handwritten: var(--font-rock-salt), "Rock Salt", cursive;
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
+
+/* Remove all padding from BlockNote */
+.bn-container {
+  padding: 0 !important;
+}
+
+.bn-editor {
+  padding: 0 !important;
+}
+
+.bn-block-container {
+  padding: 0 !important;
+}
+
+.marketing-shell {
+  font-family: var(--font-marketing-sans);
+}
+
+.marketing-shell .font-serif {
+  font-family: var(--font-marketing-serif);
+}
+
+.marketing-shell .font-sans {
+  font-family: var(--font-marketing-sans);
+}
+
+.marketing-shell .font-mono {
+  font-family: var(--font-marketing-mono);
+}
+
+.marketing-shell .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  transition-delay: var(--delay, 0ms);
+}
+
+.marketing-shell .reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.marketing-shell .sticky-container {
+  position: relative;
+  background: #fff;
+}
+
+/* ── Glass navbar overrides ── */
+.marketing-shell .glass-navbar {
+  transition:
+    height 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.marketing-shell .glass-navbar .glass-surface__content {
+  padding: 0;
+}
+
+
+.marketing-shell .marketing-noise {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3) 0.7px, transparent 0.8px),
+    radial-gradient(circle at 80% 30%, rgba(34, 34, 34, 0.08) 0.7px, transparent 0.8px),
+    radial-gradient(circle at 30% 80%, rgba(34, 34, 34, 0.06) 0.7px, transparent 0.8px);
+  background-size: 18px 18px, 22px 22px, 26px 26px;
+  background-position: 0 0, 4px 7px, 11px 3px;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.marketing-shell .feature-block {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  background: #fff;
+  box-shadow: 0 -30px 60px rgba(0, 0, 0, 0.06);
+  border-radius: 24px 24px 0 0;
+  margin-top: -24px;
+}
+
+.marketing-shell .feature-block:first-child {
+  border-radius: 0;
+  margin-top: 0;
+  box-shadow: none;
+}
+
+.marketing-shell .feature-block + .feature-block {
+  z-index: 2;
+}
+
+.marketing-shell .feature-block + .feature-block + .feature-block {
+  z-index: 3;
+}
+
+@keyframes marketing-scan-move {
+  0% {
+    top: 16px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 16px);
+    opacity: 0;
+  }
+}
+
+.marketing-shell .scan-line {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  border: none;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #16a34a, transparent);
+  animation: marketing-scan-move 2s ease-in-out infinite;
+}
+
+.marketing-shell .corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: #16a34a;
+  border-style: solid;
+}
+
+.marketing-shell .corner.tl {
+  top: 0;
+  left: 0;
+  border-width: 3px 0 0 3px;
+  border-radius: 4px 0 0 0;
+}
+
+.marketing-shell .corner.tr {
+  top: 0;
+  right: 0;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 4px 0 0;
+}
+
+.marketing-shell .corner.bl {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 4px;
+}
+
+.marketing-shell .corner.br {
+  right: 0;
+  bottom: 0;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 4px 0;
+}
+
+.marketing-shell .faq-ans {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.24s ease;
+}
+
+.marketing-shell .faq-ans.open {
+  grid-template-rows: 1fr;
+}
+
+.marketing-shell .faq-ans > * {
+  min-height: 0;
+}
+
+.marketing-shell .faq-chev {
+  height: 18px;
+  width: 18px;
+  flex-shrink: 0;
+  color: #6a6a6a;
+  transition: transform 0.2s ease;
+}
+
+.marketing-shell button[aria-expanded="true"] .faq-chev {
+  transform: rotate(90deg);
+}
+
+.marketing-shell .waitlist-card {
+  display: grid;
+  gap: 2rem;
+  border: 1px solid #e8e8e8;
+  border-radius: 32px;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at top left, rgba(58, 150, 21, 0.08), transparent 38%),
+    linear-gradient(180deg, #ffffff 0%, #f8fbf8 100%);
+}
+
+.marketing-shell .waitlist-form,
+.marketing-shell .sales-form {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.marketing-shell .waitlist-form input,
+.marketing-shell .sales-form input,
+.marketing-shell .sales-form select {
+  width: 100%;
+  border: 1px solid #d5d5d5;
+  border-radius: 16px;
+  padding: 0.95rem 1rem;
+  font-size: 0.95rem;
+  color: #222222;
+  background: #fff;
+}
+
+.marketing-shell .waitlist-form button,
+.marketing-shell .sales-primary,
+.marketing-shell .sales-secondary {
+  border-radius: 9999px;
+  padding: 0.9rem 1.25rem;
+  font-weight: 600;
+  transition: all 150ms ease;
+}
+
+.marketing-shell .waitlist-form button,
+.marketing-shell .sales-primary {
+  background: #3a9615;
+  color: #fff;
+}
+
+.marketing-shell .sales-secondary {
+  border: 1px solid #d5d5d5;
+  color: #222222;
+  background: #fff;
+}
+
+.marketing-shell .waitlist-note,
+.marketing-shell .waitlist-status,
+.marketing-shell .sales-footnote,
+.marketing-shell .sales-success {
+  font-size: 0.75rem;
+  color: #6a6a6a;
+}
+
+.marketing-shell .label-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid #d5d5d5;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4b5563;
+}
+
+.marketing-shell .label-tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #3a9615;
+}
+
+/* ── Sales Modal v2 ── */
+
+/* Custom scrollbar for the modal body */
+.sales-modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+.sales-modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sales-modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+.sales-modal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 100px;
+  transition: background 0.2s ease;
+}
+
+.sales-modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.sales-modal-scroll::-webkit-scrollbar-thumb:active {
+  background: rgba(0, 0, 0, 0.36);
+}
+
+/* Form inputs */
+.sales-input,
+.sales-select {
+  width: 100%;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  background: #fafafa;
+  outline: none;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.sales-input::placeholder {
+  color: #9ca3af;
+}
+
+.sales-input:hover,
+.sales-select:hover {
+  border-color: #d1d5db;
+  background: #fff;
+}
+
+.sales-input:focus,
+.sales-select:focus {
+  border-color: #3A9615;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(58, 150, 21, 0.1);
+}
+
+.sales-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.sales-select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%233A9615' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+}
+
+/* Legacy selectors kept for the old waitlist form */
+.marketing-shell .sales-modal-header {
+  margin-bottom: 1.25rem;
+  padding-right: 2rem;
+}
+
+
+@media (max-width: 768px) {
+  .marketing-shell .feature-block {
+    position: relative !important;
+    top: auto !important;
+    min-height: auto;
+    border-radius: 0 !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .marketing-shell .waitlist-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ── Lenis smooth scroll ── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

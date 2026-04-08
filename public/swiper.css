@@ -1,0 +1,22 @@
+/* Style the pagination container */
+#custom-pagination-container {
+  position: relative !important;
+  margin-top: 20px !important;
+  bottom: 0 !important;
+}
+
+/* Style individual pagination bullets */
+.my-custom-bullet {
+  background-color: #ccc !important; /* Default bullet color */
+  opacity: 0.8 !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  margin: 0 5px !important; /* Spacing between bullets */
+}
+
+/* Style the active pagination bullet */
+.my-custom-bullet-active {
+  background-color: #ff0000 !important; /* Active bullet color */
+  opacity: 1 !important;
+}

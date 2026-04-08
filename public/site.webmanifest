@@ -1,0 +1,13 @@
+{
+  "name": " The Players Rising",
+  "short_name": "The Players Rising",
+  "description": "A modern blog",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "categories": ["blog", "sports", "development", "team"],
+  "lang": "en",
+  "dir": "ltr"
+}
