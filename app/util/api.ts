@@ -1,3 +1,3 @@
-const BASE_URL = `http://localhost:8000`;
+const BASE_URL = `https://blog.visichek.app/`;
 
 export { BASE_URL };
