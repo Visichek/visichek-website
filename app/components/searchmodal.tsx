@@ -44,7 +44,7 @@ const SearchModal = ({ open, onClose }: SearchModalProps) => {
     try {
       setLoading(true);
       const res = await fetch(
-        `${BASE_URL}/api/v1/articles/content/search/?title=${value}&start=0&stop=10`,
+        `${BASE_URL}/articles/content/search/?title=${value}&start=0&stop=10`,
         { cache: "no-cache" }
       );
       if (!res.ok) return;

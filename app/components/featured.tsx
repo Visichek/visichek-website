@@ -5,7 +5,7 @@ import { BASE_URL } from "../util/api";
 
 const Featured = async () => {
   let blogs: Blog[];
-  const url = `${BASE_URL}/api/v1/articles/content/by-blog-type/featured?start=0&stop=4`;
+  const url = `${BASE_URL}/articles/content/by-blog-type/featured?start=0&stop=4`;
   const res = await fetch(url, {
     next: { revalidate: 60 },
   });

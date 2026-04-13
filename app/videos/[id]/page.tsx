@@ -17,7 +17,7 @@ const VideoBySlugPage = async ({ params }: Props) => {
 
   console.log("Category ID:", id);
 
-  const categoryUrl = `${BASE_URL}/api/v1/media/by-category/${id}`;
+  const categoryUrl = `${BASE_URL}/media/by-category/${id}`;
   console.log("Fetching category videos from:", categoryUrl);
 
   const categoryRes = await fetch(categoryUrl, {

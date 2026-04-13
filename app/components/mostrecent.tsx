@@ -5,7 +5,7 @@ import { BASE_URL } from "../util/api";
 
 const MostRecent = async () => {
   let blogs: Blog[];
-  const url = `${BASE_URL}/api/v1/articles/content/by-blog-type/normal?start=0&stop=10&sort=newest `;
+  const url = `${BASE_URL}/articles/content/by-blog-type/normal?start=0&stop=10&sort=newest `;
   const res = await fetch(url, {
     next: { revalidate: 60 },
   });

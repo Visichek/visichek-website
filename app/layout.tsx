@@ -75,6 +75,7 @@ const rockSalt = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://blog.visichek.app"),
   title: {
     default: "VisiChek",
     template: "%s | VisiChek",
@@ -85,7 +86,7 @@ export const metadata: Metadata = {
     title: "VisiChek",
     description:
       "Visitor management for modern facilities, departments, and security teams.",
-    url: "https://visicheck.com/",
+    url: "https://blog.visichek.app/",
     siteName: "VisiChek",
     images: [
       {

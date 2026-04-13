@@ -12,7 +12,7 @@ export interface IMenuItems {
 }
 
 const Header = async () => {
-  const res = await fetch(`${BASE_URL}/api/v1/articles/content/categories`, {
+  const res = await fetch(`${BASE_URL}/articles/content/categories`, {
     cache: "no-cache",
   });
 

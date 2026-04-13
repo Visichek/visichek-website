@@ -5,7 +5,7 @@ import FeaturedStoryGrid from "./featuredstorygrid";
 
 const HeroSection = async () => {
   let blogs: Blog[];
-  const url = `${BASE_URL}/api/v1/articles/content/by-blog-type/hero-section`;
+  const url = `${BASE_URL}/articles/content/by-blog-type/hero-section`;
   const res = await fetch(url, {
     next: { revalidate: 60 },
   });

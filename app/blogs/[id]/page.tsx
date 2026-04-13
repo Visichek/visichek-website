@@ -15,7 +15,7 @@ const BlogPageById: React.FC<IBlogPageByIdProps> = async ({ params }) => {
   console.log("Category ID:", id);
 
   let blog: BlogItem;
-  const url = `${BASE_URL}/api/v1/articles/content/${id}`;
+  const url = `${BASE_URL}/articles/content/${id}`;
   const res = await fetch(url, {
     next: { revalidate: 60 },
   });

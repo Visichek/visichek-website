@@ -9,7 +9,7 @@ const VideosPage = async () => {
   let categories: Category[] = [];
 
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/articles/content/categories`, {
+    const res = await fetch(`${BASE_URL}/articles/content/categories`, {
       next: { revalidate: 60 },
     });
 

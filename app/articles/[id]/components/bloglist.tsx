@@ -25,7 +25,7 @@ const BlogList = ({
 
     try {
       const res = await fetch(
-        `${BASE_URL}/api/v1/articles/content/by-category-slug/${categoryId}?start=${start}&stop=${
+        `${BASE_URL}/articles/content/by-category-slug/${categoryId}?start=${start}&stop=${
           start + 9
         }`
       );
