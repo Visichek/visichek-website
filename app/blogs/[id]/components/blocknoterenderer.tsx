@@ -1,24 +1,18 @@
 "use client";
 
-import "@blocknote/core/fonts/inter.css";
-import { useCreateBlockNote } from "@blocknote/react";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
+import dynamic from "next/dynamic";
 
 interface IBlockNoteRendererProp {
   content: any;
 }
 
-const BlockNoteRenderer: React.FC<IBlockNoteRendererProp> = ({ content }) => {
-  const editor = useCreateBlockNote({
-    initialContent: content,
-  });
+const BlockNoteRendererInner = dynamic(() => import("./blocknoterenderer-inner"), {
+  ssr: false,
+  loading: () => <div className="min-h-[200px]" />,
+});
 
-  return (
-    <div className="[&_.bn-container]:p-0 [&_.bn-editor]:p-0">
-      <BlockNoteView editor={editor} editable={false} theme="light" />
-    </div>
-  );
+const BlockNoteRenderer: React.FC<IBlockNoteRendererProp> = ({ content }) => {
+  return <BlockNoteRendererInner content={content} />;
 };
 
 export default BlockNoteRenderer;

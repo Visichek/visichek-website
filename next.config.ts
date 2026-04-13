@@ -2,8 +2,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
+  compress: true,
+  productionBrowserSourceMaps: false,
   experimental: {
     viewTransition: true, // Enables React's ViewTransition API
+    optimizePackageImports: [
+      "lucide-react",
+      "@blocknote/react",
+      "@blocknote/mantine",
+      "framer-motion",
+      "motion",
+      "@radix-ui/react-icons",
+    ],
   },
   images: {
     remotePatterns: [

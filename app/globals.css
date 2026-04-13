@@ -15,7 +15,7 @@
   --color-charcoal-lighter: #6a6a6a;
   --color-offwhite: #ffffff;
   --color-border: #e8e8e8;
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-marketing-sans: var(--font-twk-lausanne), "twkLausanne", ui-sans-serif, system-ui, sans-serif;
   --font-marketing-serif: var(--font-moderat-serif), "moderatSerif", ui-serif, Georgia, serif;

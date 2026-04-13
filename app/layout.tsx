@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { DM_Sans, Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AnimatedPage } from "./components/animatedpage";
 import Header from "./components/header";
@@ -18,16 +18,6 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
@@ -154,7 +144,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${dmSans.variable} ${fraunces.variable} ${moderatSerif.variable} ${twkLausanne.variable} ${sfMono.variable} ${rockSalt.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${moderatSerif.variable} ${twkLausanne.variable} ${sfMono.variable} ${rockSalt.variable}`}
       style={{
         scrollbarWidth: "thin",
         scrollbarColor: "#374151 #000000",
