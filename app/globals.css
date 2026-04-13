@@ -426,6 +426,12 @@
     box-shadow: none !important;
   }
 
+  .marketing-shell .scan-line {
+    animation: none !important;
+    opacity: 0.45;
+    top: 50%;
+  }
+
   .marketing-shell .waitlist-card {
     grid-template-columns: 1fr;
   }

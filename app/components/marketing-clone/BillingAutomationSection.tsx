@@ -122,7 +122,7 @@ export function BillingAutomationSection() {
           </Link>
         </RevealWrapper>
 
-        <RevealWrapper delay={100}>
+        <RevealWrapper delay={100} className="hidden md:block">
           <IDScanMockup />
         </RevealWrapper>
       </div>

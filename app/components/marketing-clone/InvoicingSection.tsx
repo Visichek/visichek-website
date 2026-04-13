@@ -193,8 +193,8 @@ export function InvoicingSection() {
           </Link>
         </RevealWrapper>
 
-        <RevealWrapper delay={100}>
-          <div className="relative h-[420px] w-full">
+        <RevealWrapper delay={100} className="hidden md:block">
+          <div className="relative hidden md:block h-[420px] w-full">
             <CardSwap
               width={420}
               height={320}

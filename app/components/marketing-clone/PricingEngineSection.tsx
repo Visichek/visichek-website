@@ -11,7 +11,7 @@ export function PricingEngineSection() {
     <div className="feature-block bg-white">
       <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-16 items-center">
         {/* Lanyard — left on desktop */}
-        <RevealWrapper className="order-2 md:order-1">
+        <RevealWrapper className="order-2 md:order-1 hidden md:block">
           <div className="relative h-[480px] md:h-[520px] w-full rounded-3xl border border-green-100 bg-green-50 overflow-hidden">
             <Lanyard
               position={[0, 0, 30]}
