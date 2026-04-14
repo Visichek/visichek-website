@@ -4,7 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
-import GlassSurface from "@/components/GlassSurface";
+import dynamic from "next/dynamic";
+
+const GlassSurface = dynamic(() => import("@/components/GlassSurface"), {
+  ssr: false,
+});
 
 const SCROLL_THRESHOLD = 50;
 const EASE = "cubic-bezier(0.16,1,0.3,1)";
@@ -164,6 +168,7 @@ export default function MarketingHeader() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const rafRef = useRef<number | null>(null);
   const isHome = pathname === "/";
   const isPricing = pathname === "/pricing";
@@ -209,6 +214,24 @@ export default function MarketingHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  // Close mobile sheet on Escape
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
+
   useEffect(() => setMobileOpen(false), [pathname]);
 
   useEffect(() => {
@@ -252,15 +275,15 @@ export default function MarketingHeader() {
             ].join(", "),
           }}
         >
-          {/* Layer 0 — GlassSurface */}
+          {/* Layer 0 — GlassSurface (desktop only — skipped on mobile for perf) */}
           <div
-            className="absolute inset-0 overflow-hidden"
+            className="absolute inset-0 hidden lg:block overflow-hidden"
             style={{
               borderRadius: "inherit",
               transition: `border-radius 0.55s ${EASE}`,
             }}
           >
-            <GlassSurface
+            {isDesktop && <GlassSurface
               width={1280}
               height={barH}
               borderRadius={barR}
@@ -288,12 +311,13 @@ export default function MarketingHeader() {
               }}
             >
               <span />
-            </GlassSurface>
+            </GlassSurface>}
           </div>
 
-          {/* Layer 1 — White cover (fades on scroll) */}
+          {/* Layer 1 — White cover (fades on scroll, desktop only). Mobile gets a
+              solid white bar rendered below for speed + clarity. */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none hidden lg:block"
             style={{
               borderRadius: "inherit",
               background: "#ffffff",
@@ -302,6 +326,16 @@ export default function MarketingHeader() {
                 : "1px solid rgba(0,0,0,0.06)",
               opacity: isScrolled ? 0 : 1,
               transition: "opacity 0.4s ease, border-bottom 0.4s ease",
+            }}
+          />
+
+          {/* Mobile solid white bar */}
+          <div
+            className="absolute inset-0 pointer-events-none lg:hidden"
+            style={{
+              borderRadius: "inherit",
+              background: "#ffffff",
+              borderBottom: "1px solid rgba(0,0,0,0.06)",
             }}
           />
 
@@ -380,7 +414,7 @@ export default function MarketingHeader() {
               <button
                 type="button"
                 onClick={() => setMobileOpen((v) => !v)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 lg:hidden"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 lg:hidden"
                 style={{
                   border: isScrolled
                     ? "1px solid rgba(0,0,0,0.08)"
@@ -405,88 +439,84 @@ export default function MarketingHeader() {
         </div>
       </header>
 
-      {/* ═══════ MOBILE MENU ═══════ */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[55] lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200"
-            onClick={closeMobile}
-          />
+      {/* ═══════ MOBILE SHEET ═══════ */}
+      <div
+        className={`fixed inset-0 z-[55] lg:hidden ${mobileOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        aria-hidden={!mobileOpen}
+      >
+        {/* Backdrop */}
+        <div
+          onClick={closeMobile}
+          className="absolute inset-0 bg-black/40 transition-opacity duration-300"
+          style={{ opacity: mobileOpen ? 1 : 0 }}
+        />
 
-          <div
-            className="absolute left-4 right-4 z-10 overflow-hidden rounded-2xl animate-in slide-in-from-top-2 fade-in duration-300"
-            style={{
-              top: isScrolled ? "82px" : "78px",
-              boxShadow:
-                "0 20px 60px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08)",
-            }}
-          >
-            <GlassSurface
-              width={600}
-              height={400}
-              borderRadius={16}
-              borderWidth={0.08}
-              brightness={94}
-              opacity={0.45}
-              blur={16}
-              displace={0.3}
-              backgroundOpacity={0.05}
-              saturation={1.6}
-              distortionScale={-100}
-              redOffset={0}
-              greenOffset={6}
-              blueOffset={12}
-              mixBlendMode="screen"
-              style={{ width: "100%", height: "auto" }}
+        {/* Right-side sheet — solid, no glass */}
+        <aside
+          role="dialog"
+          aria-modal="true"
+          aria-label="Main menu"
+          className="absolute right-0 top-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-out"
+          style={{
+            transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
+          }}
+        >
+          <div className="flex items-center justify-between px-5 h-[60px] border-b border-black/5">
+            <span className="font-semibold text-[#359300] text-[17px]">
+              VisiChek
+            </span>
+            <button
+              type="button"
+              onClick={closeMobile}
+              aria-label="Close menu"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 text-gray-700 hover:bg-gray-50"
             >
-              <div className="flex w-full flex-col gap-1 p-3">
-                {links.map((l, i) => {
-                  const active = isLinkActive(l.href);
-                  return (
-                    <Link
-                      key={l.label}
-                      href={l.href}
-                      onClick={closeMobile}
-                      className="rounded-xl px-4 py-3 text-[15px] transition-all duration-200 hover:bg-white/40 hover:pl-5"
-                      style={{
-                        animationDelay: `${i * 40}ms`,
-                        fontWeight: active ? 600 : 500,
-                        color: active ? "#2e7a11" : "#1f2937",
-                        background: active
-                          ? "rgba(58,150,21,0.06)"
-                          : "transparent",
-                        borderLeft: active
-                          ? "3px solid #3A9615"
-                          : "3px solid transparent",
-                      }}
-                    >
-                      {l.label}
-                    </Link>
-                  );
-                })}
-                <div className="my-1 h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMobile();
-                    openSalesModal();
-                  }}
-                  className="rounded-xl px-4 py-3 text-left text-[15px] font-medium text-gray-800 transition-all duration-200 hover:bg-white/40 hover:pl-5"
-                >
-                  Contact Sales
-                </button>
-                <Link
-                  href="/pricing#pricing"
-                  onClick={closeMobile}
-                  className="mt-1 flex items-center justify-center rounded-xl bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-4 py-3 text-[15px] font-semibold text-white shadow-sm shadow-green-700/15"
-                >
-                  Get Pricing
-                </Link>
-              </div>
-            </GlassSurface>
+              <X className="h-4 w-4" />
+            </button>
           </div>
-        </div>
-      )}
+
+          <nav className="flex flex-col p-3 gap-1 overflow-y-auto">
+            {links.map((l) => {
+              const active = isLinkActive(l.href);
+              return (
+                <Link
+                  key={l.label}
+                  href={l.href}
+                  onClick={closeMobile}
+                  className="rounded-lg px-4 py-3 text-[15px] transition-colors"
+                  style={{
+                    fontWeight: active ? 600 : 500,
+                    color: active ? "#2e7a11" : "#1f2937",
+                    background: active ? "rgba(58,150,21,0.07)" : "transparent",
+                  }}
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto border-t border-black/5 p-3 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                closeMobile();
+                openSalesModal();
+              }}
+              className="w-full rounded-full border border-black/10 bg-white px-4 py-3 text-[14px] font-medium text-gray-800 hover:bg-gray-50"
+            >
+              Contact Sales
+            </button>
+            <Link
+              href="/pricing#pricing"
+              onClick={closeMobile}
+              className="w-full flex items-center justify-center rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-4 py-3 text-[14px] font-semibold text-white shadow-sm shadow-green-700/15"
+            >
+              Get Pricing
+            </Link>
+          </div>
+        </aside>
+      </div>
     </>
   );
 }

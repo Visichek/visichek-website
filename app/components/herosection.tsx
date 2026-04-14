@@ -33,7 +33,15 @@ const HeroSection = async () => {
   }
 
   if (blogs.length === 0) {
-    return null;
+    return (
+      <section className="px-5 md:px-32 py-16 text-center">
+        <div className="mx-auto max-w-md rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10">
+          <p className="text-[15px] text-gray-600">
+            No articles available yet — check back later.
+          </p>
+        </div>
+      </section>
+    );
   }
 
   const mainArticle = blogs[0];

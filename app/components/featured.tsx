@@ -31,7 +31,16 @@ const Featured = async () => {
   }
 
   if (blogs.length === 0) {
-    return null;
+    return (
+      <section className="bg-white px-5 md:px-32 pt-16 pb-10">
+        <div className="flex justify-between items-center border-b border-b-gray-300 pt-2 pb-3">
+          <p className="text-sm font-semibold text-black">FEATURED STORY</p>
+        </div>
+        <p className="py-10 text-center text-[15px] text-gray-500">
+          No featured stories yet — check back later.
+        </p>
+      </section>
+    );
   }
 
   const billBoardFeaturedData = blogs[0];
