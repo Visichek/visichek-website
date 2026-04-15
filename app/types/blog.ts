@@ -8,6 +8,7 @@ export interface Category {
   itemIndex: number | null;
   name: string;
   slug: string;
+  imageUrl?: string | null;
 }
 
 export interface FeatureImage {

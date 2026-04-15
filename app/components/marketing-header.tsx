@@ -117,7 +117,7 @@ function NavLink({
 
 /* ─── Scroll-spy: tracks which #section is in view ─── */
 function useActiveSection(sectionIds: string[]) {
-  const [active, setActive] = useState(sectionIds[0] || "");
+  const [active, setActive] = useState("");
 
   useEffect(() => {
     // Clean IDs: remove leading # and path prefixes
@@ -247,8 +247,15 @@ export default function MarketingHeader() {
   const barR = isScrolled ? 24 : 0;
 
   function isLinkActive(href: string) {
-    const hash = href.split("#")[1];
-    if (!hash) return false;
+    const [path, hash] = href.split("#");
+    const linkPath = path || "/";
+    const onLinkPath =
+      linkPath === "/"
+        ? pathname === "/"
+        : pathname === linkPath || pathname.startsWith(`${linkPath}/`);
+
+    if (!hash) return onLinkPath;
+    if (!onLinkPath) return false;
     return activeSection === hash;
   }
 

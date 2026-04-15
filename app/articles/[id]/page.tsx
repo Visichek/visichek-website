@@ -56,13 +56,15 @@ const CategoryPage: React.FC<Props> = async ({ params }) => {
   }
 
   const categoryName = blogs[0].category.name;
+  const categoryImage = blogs[0].category.imageUrl;
+  console.log("[CategoryPage] category image for", id, "->", categoryImage);
 
   return (
     <section className="bg-white">
       <div>
         <CategoryLargeCard
           title={categoryName}
-          imageSrc="/hands_raised.webp"
+          imageSrc={categoryImage || "/hands_raised.webp"}
           imageAlt={`${id} image`}
         />
       </div>

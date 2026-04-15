@@ -66,7 +66,7 @@ const MobileMenu: React.FC<IMobileMenuProps> = ({ data }) => {
           {data.map((item, index) => (
             <React.Fragment key={item.slug ?? index}>
               <Link
-                href={`/categories/${item.slug}`}
+                href={`/articles/${item.slug}`}
                 onClick={() => setIsOpen(false)}
                 className="hover:text-gray-300 focus:text-gray-300 transition-colors underline underline-offset-8"
               >

@@ -418,16 +418,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           aria-label="Main navigation header"
         >
           <div className="sm-logo flex items-center select-none pointer-events-auto" aria-label="Logo">
-            {logoUrl && (
-              <img
-                src={logoUrl}
-                alt="Logo"
-                className="sm-logo-img block h-8 w-auto object-contain"
-                draggable={false}
-                width={110}
-                height={24}
-              />
-            )}
+            <span className="sm-logo-text block text-white font-bold text-lg tracking-tight leading-none">
+              visiChek
+            </span>
           </div>
 
           <button

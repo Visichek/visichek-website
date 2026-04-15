@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import MobileMenu from "./mobilemenu";
 import HeaderDropdown from "./headerdropdown";
@@ -37,14 +36,10 @@ const Header = async () => {
       <div className="flex gap-10">
         <div className="flex gap-3">
           <MobileMenu data={moreCategories} />
-          <Link href="/">
-            <Image
-              src="/logo-footer.png"
-              alt="blog logo"
-              width={70.44}
-              height={30}
-              priority
-            />
+          <Link href="/" className="flex items-center h-[50px] w-[70.44px]">
+            <span className="text-white font-bold text-lg tracking-tight leading-none">
+              visiChek
+            </span>
           </Link>
         </div>
 
