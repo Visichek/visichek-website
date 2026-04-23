@@ -14,37 +14,19 @@ const Featured = async () => {
     });
 
     if (!res.ok) {
-      return (
-        <section className="py-10 text-center text-[#6a6a6a]">
-          <p>Failed to load featured stories.</p>
-        </section>
-      );
+      return null;
     }
 
     const data = await res.json();
     blogs = data.data?.blogs || [];
   } catch (error) {
     console.error("Failed to load featured stories data:", error);
-    return (
-      <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Couldn&apos;t load featured stories right now.</p>
-      </section>
-    );
+    return null;
   }
 
+  // No featured stories? Render nothing — silent is better than a shrug.
   if (blogs.length === 0) {
-    return (
-      <section className="bg-white px-5 md:px-10 lg:px-16 pt-16 pb-12">
-        <BlogSectionHeader
-          eyebrow="Featured"
-          title="Hand-picked stories"
-          description="Editorial favourites chosen by the VisiChek team."
-        />
-        <p className="py-10 text-center text-[14px] text-[#6a6a6a]">
-          No featured stories yet — check back later.
-        </p>
-      </section>
-    );
+    return null;
   }
 
   const billBoardFeaturedData = blogs[0];
@@ -66,7 +48,6 @@ const Featured = async () => {
         author={billBoardFeaturedData.author.name}
         imageUrl={billBoardFeaturedData.featureImage.url}
         href={`/blogs/${billBoardFeaturedData.id}`}
-        eyebrow="Featured story"
         categoryName={billBoardFeaturedData.category?.name}
         categorySlug={billBoardFeaturedData.category?.slug}
         dateCreated={billBoardFeaturedData.dateCreated}

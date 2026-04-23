@@ -52,10 +52,6 @@ const ArticleLinkCard: React.FC<IArticleLinkCard> = ({
                   "linear-gradient(180deg, rgba(255,255,255,0) 60%, rgba(26,26,26,0.05) 100%)",
               }}
             />
-            <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#2e7a11] shadow-sm backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#3A9615]" />
-              Featured story
-            </span>
           </div>
 
           {/* Text */}

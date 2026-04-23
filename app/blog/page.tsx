@@ -3,6 +3,7 @@ import BlogHeroSection from "../components/herosection";
 import MostRecent from "../components/mostrecent";
 import BlogCategoryStrip from "../components/blogcategorystrip";
 import Link from "next/link";
+import { BASE_URL } from "../util/api";
 
 export const metadata = {
   title: "Blog | VisiChek",
@@ -10,7 +11,42 @@ export const metadata = {
     "Insights, guides, and stories about visitor management, workplace security, and facility operations.",
 };
 
-export default function BlogPage() {
+/**
+ * Light-touch check that counts posts across the three blog feeds. We only
+ * use this to pick between "render sections" and "render page-wide empty state".
+ * The individual section components still fetch their own data — Next.js will
+ * dedupe the identical fetch calls during the same render.
+ */
+async function hasAnyPosts(): Promise<boolean> {
+  const endpoints = [
+    `${BASE_URL}/articles/content/by-blog-type/hero-section`,
+    `${BASE_URL}/articles/content/by-blog-type/normal?start=0&stop=1&sort=newest`,
+    `${BASE_URL}/articles/content/by-blog-type/featured?start=0&stop=1`,
+  ];
+
+  try {
+    const results = await Promise.all(
+      endpoints.map((url) =>
+        fetch(url, { next: { revalidate: 60 } })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null),
+      ),
+    );
+
+    return results.some((data) => {
+      const blogs = data?.data?.blogs;
+      return Array.isArray(blogs) && blogs.length > 0;
+    });
+  } catch {
+    // If the whole thing blew up, assume posts exist so we still render the
+    // sections (they'll handle their own fallback).
+    return true;
+  }
+}
+
+export default async function BlogPage() {
+  const anyPosts = await hasAnyPosts();
+
   return (
     <main className="min-h-screen bg-white">
       {/* Blog intro — refined hero with decorative backdrop */}
@@ -57,13 +93,15 @@ export default function BlogPage() {
             VisiChek.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="#latest"
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-sm shadow-green-700/20 transition-all duration-200 hover:-translate-y-px hover:shadow-md"
-            >
-              Browse latest
-              <span aria-hidden="true">→</span>
-            </Link>
+            {anyPosts && (
+              <Link
+                href="#latest"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-sm shadow-green-700/20 transition-all duration-200 hover:-translate-y-px hover:shadow-md"
+              >
+                Browse latest
+                <span aria-hidden="true">→</span>
+              </Link>
+            )}
             <Link
               href="/#overview"
               className="inline-flex items-center rounded-full border border-[#e8e8e8] bg-white px-5 py-2.5 text-[13.5px] font-medium text-[#374151] transition-all duration-200 hover:border-[#d8d8d8] hover:shadow-sm"
@@ -80,13 +118,51 @@ export default function BlogPage() {
       </section>
 
       {/* Blog content */}
-      <div className="mx-auto max-w-[1470px] 2xl:max-w-[1470px]">
-        <BlogHeroSection />
-        <div id="latest">
-          <MostRecent />
+      {anyPosts ? (
+        <div className="mx-auto max-w-[1470px] 2xl:max-w-[1470px]">
+          <BlogHeroSection />
+          <div id="latest">
+            <MostRecent />
+          </div>
+          <Featured />
         </div>
-        <Featured />
-      </div>
+      ) : (
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-[520px] rounded-3xl border border-dashed border-[#e8e8e8] bg-[#fafafa] p-10 text-center">
+            <div
+              aria-hidden="true"
+              className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-[#3A9615]/10 text-[#2e7a11]"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 7h16M4 12h10M4 17h16" />
+              </svg>
+            </div>
+            <h2 className="font-serif text-[24px] md:text-[26px] font-bold tracking-[-0.02em] text-[#1a1a1a]">
+              The blog is just getting started
+            </h2>
+            <p className="mt-3 text-[14.5px] leading-relaxed text-[#6a6a6a]">
+              No stories have been published yet. Check back soon — new
+              guides and playbooks are on the way.
+            </p>
+            <Link
+              href="/"
+              className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-[#e8e8e8] bg-white px-4 py-2 text-[13px] font-medium text-[#374151] transition-all duration-200 hover:border-[#d8d8d8] hover:shadow-sm"
+            >
+              Back to home
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

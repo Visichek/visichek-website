@@ -13,11 +13,7 @@ const HeroSection = async () => {
     });
 
     if (!res.ok) {
-      return (
-        <section className="py-10 text-center text-[#6a6a6a]">
-          <p>Failed to load featured stories.</p>
-        </section>
-      );
+      return null;
     }
 
     const data = await res.json();
@@ -26,23 +22,13 @@ const HeroSection = async () => {
     );
   } catch (error) {
     console.error("Failed to load hero section data:", error);
-    return (
-      <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Couldn&apos;t load featured stories right now.</p>
-      </section>
-    );
+    return null;
   }
 
+  // Silently render nothing when this section has no content — the
+  // page-level empty state handles the truly-no-content-anywhere case.
   if (blogs.length === 0) {
-    return (
-      <section className="px-5 md:px-10 lg:px-16 py-16 text-center">
-        <div className="mx-auto max-w-md rounded-2xl border border-dashed border-[#e8e8e8] bg-[#fafafa] p-10">
-          <p className="text-[14px] text-[#6a6a6a]">
-            No articles available yet — check back later.
-          </p>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   const mainArticle = blogs[0];

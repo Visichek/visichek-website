@@ -161,16 +161,22 @@ export default function MarketingBlogDropdown({
         )}
       </Link>
 
-      {/* Hover bridge */}
+      {/* Hover bridge — fixed, viewport-centered so mouse can travel from
+          the Blog trigger across to the centered dropdown without closing */}
       <div
         aria-hidden="true"
-        className="absolute left-1/2 top-full h-3 w-[760px] max-w-[92vw] -translate-x-1/2"
+        className="fixed left-1/2 z-40 h-6 w-[900px] max-w-[94vw] -translate-x-1/2"
+        style={{
+          top: "calc(var(--nav-bottom, 68px) - 6px)",
+          pointerEvents: isOpen ? "auto" : "none",
+        }}
       />
 
-      {/* Dropdown panel */}
+      {/* Dropdown panel — fixed to the viewport so it's truly centered on screen */}
       <div
-        className="absolute left-1/2 top-full z-50 mt-3 -translate-x-1/2"
+        className="fixed left-1/2 z-50 -translate-x-1/2"
         style={{
+          top: "var(--nav-bottom, 72px)",
           opacity: isOpen ? 1 : 0,
           pointerEvents: isOpen ? "auto" : "none",
           transform: `translateX(-50%) translateY(${isOpen ? "0px" : "-6px"})`,
@@ -203,14 +209,14 @@ export default function MarketingBlogDropdown({
             </Link>
           </div>
 
-          {/* Body: two columns */}
-          <div className="grid grid-cols-12 gap-0">
-            {/* Featured panel */}
-            <div className="col-span-12 border-b border-[#f0f0f0] p-4 md:col-span-5 md:border-b-0 md:border-r md:p-5">
-              <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-widest text-[#6a6a6a]">
-                Featured story
-              </p>
-              {featured ? (
+          {/* Body: two columns when featured exists, single-column otherwise */}
+          <div className={featured ? "grid grid-cols-12 gap-0" : "p-4"}>
+            {/* Featured panel — only when we actually have a featured story */}
+            {featured && (
+              <div className="col-span-12 border-b border-[#f0f0f0] p-4 md:col-span-5 md:border-b-0 md:border-r md:p-5">
+                <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-widest text-[#6a6a6a]">
+                  Featured story
+                </p>
                 <Link
                   href={`/blogs/${featured.id}`}
                   className="group block overflow-hidden rounded-xl ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-[0_12px_32px_-10px_rgba(0,0,0,0.22)]"
@@ -227,14 +233,13 @@ export default function MarketingBlogDropdown({
                       sizes="(max-width: 768px) 92vw, 380px"
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-                    {featured.category?.name && (
-                      <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-widest text-[#2e7a11] shadow-sm backdrop-blur">
-                        {featured.category.name}
-                      </span>
-                    )}
                   </div>
                   <div className="bg-white p-4">
+                    {featured.category?.name && (
+                      <p className="mb-2 text-[10.5px] font-semibold uppercase tracking-widest text-[#2e7a11]">
+                        {featured.category.name}
+                      </p>
+                    )}
                     <p className="line-clamp-2 font-serif text-[17px] font-semibold leading-snug tracking-[-0.01em] text-[#1a1a1a] transition-colors duration-200 group-hover:text-[#2e7a11]">
                       {featured.title}
                     </p>
@@ -271,24 +276,27 @@ export default function MarketingBlogDropdown({
                     </div>
                   </div>
                 </Link>
-              ) : (
-                <div className="animate-pulse overflow-hidden rounded-xl ring-1 ring-black/5">
-                  <div className="aspect-[16/10] bg-[#f2f2f2]" />
-                  <div className="space-y-2 p-4">
-                    <div className="h-3.5 w-3/4 rounded bg-[#efefef]" />
-                    <div className="h-3 w-full rounded bg-[#f3f3f3]" />
-                    <div className="h-3 w-5/6 rounded bg-[#f3f3f3]" />
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Categories panel */}
-            <div className="col-span-12 p-3 md:col-span-7 md:p-4">
+            <div
+              className={
+                featured
+                  ? "col-span-12 p-3 md:col-span-7 md:p-4"
+                  : "p-0"
+              }
+            >
               <p className="mb-2 px-1 text-[10.5px] font-semibold uppercase tracking-widest text-[#6a6a6a]">
                 Browse topics
               </p>
-              <div className="grid grid-cols-1 gap-1">
+              <div
+                className={
+                  featured
+                    ? "grid grid-cols-1 gap-1"
+                    : "grid grid-cols-1 gap-1 md:grid-cols-2"
+                }
+              >
                 {showCategories
                   ? categories.map((c) => (
                       <Link

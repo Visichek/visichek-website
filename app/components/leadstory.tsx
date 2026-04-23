@@ -9,7 +9,6 @@ interface BillboardHeroProps {
   author: string;
   imageUrl: string;
   href: string;
-  eyebrow?: string;
   categoryName?: string;
   categorySlug?: string;
   dateCreated?: number;
@@ -21,7 +20,6 @@ const BillboardHero = ({
   author,
   imageUrl,
   href,
-  eyebrow = "Lead story",
   categoryName,
   categorySlug,
   dateCreated,
@@ -42,10 +40,6 @@ const BillboardHero = ({
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.035]"
                 />
-                <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#2e7a11] shadow-sm backdrop-blur">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#3A9615]" />
-                  {eyebrow}
-                </span>
               </div>
             </div>
 

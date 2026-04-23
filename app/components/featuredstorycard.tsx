@@ -44,13 +44,13 @@ const FeaturedStoryCard: React.FC<IFeaturedStoryCard> = ({
           className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           priority
         />
-        {categoryName && (
-          <span className="absolute left-4 top-4">
-            <CategoryChip name={categoryName} slug={categorySlug} />
-          </span>
-        )}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-6">
+        {categoryName && (
+          <div>
+            <CategoryChip name={categoryName} slug={categorySlug} />
+          </div>
+        )}
         <h2 className="font-serif text-[22px] md:text-[24px] font-bold leading-[1.15] tracking-[-0.01em] text-[#1a1a1a] line-clamp-2 transition-colors duration-200 group-hover:text-[#2e7a11]">
           {headerText}
         </h2>

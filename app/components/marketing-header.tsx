@@ -247,6 +247,16 @@ export default function MarketingHeader() {
   const barH = isScrolled ? 60 : 72;
   const barR = isScrolled ? 24 : 0;
 
+  // Publish the nav's bottom edge as a CSS variable so any dropdown
+  // (e.g. the centered Blog dropdown) can anchor to it via `var(--nav-bottom)`.
+  useEffect(() => {
+    const topOffset = isScrolled ? 10 : 0; // matches <header> padding-top
+    document.documentElement.style.setProperty(
+      "--nav-bottom",
+      `${topOffset + barH}px`,
+    );
+  }, [isScrolled, barH]);
+
   function isLinkActive(href: string) {
     const [path, hash] = href.split("#");
     const linkPath = path || "/";
@@ -380,26 +390,28 @@ export default function MarketingHeader() {
               </span>
             </Link>
 
-            {/* Desktop links */}
-            <nav className="hidden items-center gap-6 lg:flex">
-              {links.map((l) => (
-                <NavLink
-                  key={l.label}
-                  href={l.href}
-                  isActive={isLinkActive(l.href)}
+            {/* Desktop links — absolutely centered so the group sits dead-centre regardless of brand/action widths */}
+            <nav className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-6 lg:flex">
+              <div className="pointer-events-auto flex items-center gap-6">
+                {links.map((l) => (
+                  <NavLink
+                    key={l.label}
+                    href={l.href}
+                    isActive={isLinkActive(l.href)}
+                    isGlass={isScrolled}
+                  >
+                    {l.label}
+                  </NavLink>
+                ))}
+                <MarketingBlogDropdown
+                  isActive={
+                    pathname === "/blog" ||
+                    pathname.startsWith("/blogs") ||
+                    pathname.startsWith("/articles")
+                  }
                   isGlass={isScrolled}
-                >
-                  {l.label}
-                </NavLink>
-              ))}
-              <MarketingBlogDropdown
-                isActive={
-                  pathname === "/blog" ||
-                  pathname.startsWith("/blogs") ||
-                  pathname.startsWith("/articles")
-                }
-                isGlass={isScrolled}
-              />
+                />
+              </div>
             </nav>
 
             {/* Actions */}

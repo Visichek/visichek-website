@@ -14,37 +14,19 @@ const MostRecent = async () => {
     });
 
     if (!res.ok) {
-      return (
-        <section className="py-10 text-center text-[#6a6a6a]">
-          <p>Failed to load recent stories.</p>
-        </section>
-      );
+      return null;
     }
 
     const data = await res.json();
     blogs = data.data?.blogs || [];
   } catch (error) {
     console.error("Failed to load recent stories data:", error);
-    return (
-      <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Couldn&apos;t load recent stories right now.</p>
-      </section>
-    );
+    return null;
   }
 
+  // No recent stories? Render nothing so adjacent sections flow cleanly.
   if (blogs.length === 0) {
-    return (
-      <section className="bg-white px-5 md:px-10 lg:px-16 pt-16">
-        <BlogSectionHeader
-          eyebrow="Most recent"
-          title="Fresh off the press"
-          description="The latest thinking from the VisiChek team."
-        />
-        <p className="py-10 text-center text-[14px] text-[#6a6a6a]">
-          No articles available yet — check back later.
-        </p>
-      </section>
-    );
+    return null;
   }
 
   const billBoardRecentData = blogs[0];
@@ -64,7 +46,6 @@ const MostRecent = async () => {
         author={billBoardRecentData.author.name}
         imageUrl={billBoardRecentData.featureImage.url}
         href={`/blogs/${billBoardRecentData.id}`}
-        eyebrow="Latest"
         categoryName={billBoardRecentData.category?.name}
         categorySlug={billBoardRecentData.category?.slug}
         dateCreated={billBoardRecentData.dateCreated}
