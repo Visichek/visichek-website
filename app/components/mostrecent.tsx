@@ -5,28 +5,29 @@ import { Blog } from "../types/blog";
 import { BASE_URL } from "../util/api";
 
 const MostRecent = async () => {
-  let blogs: Blog[];
+  let blogs: Blog[] = [];
   const url = `${BASE_URL}/articles/content/by-blog-type/normal?start=0&stop=10&sort=newest `;
-  const res = await fetch(url, {
-    next: { revalidate: 60 },
-  });
-
-  if (!res.ok) {
-    return (
-      <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Failed to load recent stories.</p>
-      </section>
-    );
-  }
 
   try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+      return (
+        <section className="py-10 text-center text-[#6a6a6a]">
+          <p>Failed to load recent stories.</p>
+        </section>
+      );
+    }
+
     const data = await res.json();
     blogs = data.data?.blogs || [];
   } catch (error) {
-    console.error("Failed to parse recent stories data:", error);
+    console.error("Failed to load recent stories data:", error);
     return (
       <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Something went wrong loading the content.</p>
+        <p>Couldn&apos;t load recent stories right now.</p>
       </section>
     );
   }

@@ -5,28 +5,29 @@ import { Blog } from "../types/blog";
 import { BASE_URL } from "../util/api";
 
 const Featured = async () => {
-  let blogs: Blog[];
+  let blogs: Blog[] = [];
   const url = `${BASE_URL}/articles/content/by-blog-type/featured?start=0&stop=4`;
-  const res = await fetch(url, {
-    next: { revalidate: 60 },
-  });
-
-  if (!res.ok) {
-    return (
-      <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Failed to load featured stories.</p>
-      </section>
-    );
-  }
 
   try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+      return (
+        <section className="py-10 text-center text-[#6a6a6a]">
+          <p>Failed to load featured stories.</p>
+        </section>
+      );
+    }
+
     const data = await res.json();
     blogs = data.data?.blogs || [];
   } catch (error) {
-    console.error("Failed to parse featured stories data:", error);
+    console.error("Failed to load featured stories data:", error);
     return (
       <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Something went wrong loading the content.</p>
+        <p>Couldn&apos;t load featured stories right now.</p>
       </section>
     );
   }

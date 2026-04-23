@@ -11,21 +11,21 @@ export interface IMenuItems {
 }
 
 const Header = async () => {
-  const res = await fetch(`${BASE_URL}/articles/content/categories`, {
-    cache: "no-cache",
-  });
+  let allCategories: IMenuItems[] = [];
+  try {
+    const res = await fetch(`${BASE_URL}/articles/content/categories`, {
+      cache: "no-cache",
+    });
 
-  let allCategories = [];
-  if (res.ok) {
-    const data = await res.json();
-    allCategories = data.data.listOfCategories;
-  } else {
-    console.error("Failed to fetch categories:", res.status);
-    return (
-      <section className="py-10 text-center text-gray-500">
-        <p>Something went wrong loading the content.</p>
-      </section>
-    );
+    if (res.ok) {
+      const data = await res.json();
+      allCategories = data?.data?.listOfCategories || [];
+    } else {
+      console.error("Failed to fetch categories:", res.status);
+    }
+  } catch (error) {
+    console.error("Failed to fetch header categories:", error);
+    allCategories = [];
   }
 
   const mainCategories = allCategories.slice(0, 5);

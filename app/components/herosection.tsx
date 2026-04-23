@@ -4,30 +4,31 @@ import ArticleLinkCard from "./articlelinkcard";
 import FeaturedStoryGrid from "./featuredstorygrid";
 
 const HeroSection = async () => {
-  let blogs: Blog[];
+  let blogs: Blog[] = [];
   const url = `${BASE_URL}/articles/content/by-blog-type/hero-section`;
-  const res = await fetch(url, {
-    next: { revalidate: 60 },
-  });
-
-  if (!res.ok) {
-    return (
-      <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Failed to load featured stories.</p>
-      </section>
-    );
-  }
 
   try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+      return (
+        <section className="py-10 text-center text-[#6a6a6a]">
+          <p>Failed to load featured stories.</p>
+        </section>
+      );
+    }
+
     const data = await res.json();
     blogs = (data.data?.blogs || []).sort(
       (a: Blog, b: Blog) => (a.itemIndex ?? 999) - (b.itemIndex ?? 999)
     );
   } catch (error) {
-    console.error("Failed to parse hero section data:", error);
+    console.error("Failed to load hero section data:", error);
     return (
       <section className="py-10 text-center text-[#6a6a6a]">
-        <p>Something went wrong loading the content.</p>
+        <p>Couldn&apos;t load featured stories right now.</p>
       </section>
     );
   }

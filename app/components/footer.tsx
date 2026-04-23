@@ -1,24 +1,24 @@
 import Link from "next/link";
 import React from "react";
 import { BASE_URL } from "../util/api";
-import { CategoryApiResponse } from "../types/category";
+import { CategoryApiResponse, Category } from "../types/category";
 
 const Footer: React.FC = async () => {
-  const res = await fetch(`${BASE_URL}/articles/content/categories`, {
-    next: { revalidate: 60 },
-  });
+  let allCategories: Category[] = [];
+  try {
+    const res = await fetch(`${BASE_URL}/articles/content/categories`, {
+      next: { revalidate: 60 },
+    });
 
-  let allCategories = [];
-  if (res.ok) {
-    const data: CategoryApiResponse = await res.json();
-    allCategories = data.data.listOfCategories;
-  } else {
-    console.error("Failed to fetch categories:", res.status);
-    return (
-      <section className="py-10 text-center text-gray-500">
-        <p>Something went wrong loading the content.</p>
-      </section>
-    );
+    if (res.ok) {
+      const data: CategoryApiResponse = await res.json();
+      allCategories = data?.data?.listOfCategories || [];
+    } else {
+      console.error("Failed to fetch categories:", res.status);
+    }
+  } catch (error) {
+    console.error("Failed to fetch footer categories:", error);
+    allCategories = [];
   }
 
   const getRandomItems = (array: any[], count: any) => {
