@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import { BASE_URL } from "../util/api";
 import type { Blog, Category } from "../types/blog";
@@ -30,10 +31,15 @@ export default function MarketingBlogDropdown({
   isGlass,
 }: MarketingBlogDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [featured, setFeatured] = useState<Blog | null>(null);
   const [loaded, setLoaded] = useState(false);
   const closeTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -161,28 +167,30 @@ export default function MarketingBlogDropdown({
         )}
       </Link>
 
-      {/* Hover bridge — fixed, viewport-centered so mouse can travel from
-          the Blog trigger across to the centered dropdown without closing */}
-      <div
-        aria-hidden="true"
-        className="fixed left-1/2 z-40 h-6 w-[900px] max-w-[94vw] -translate-x-1/2"
-        style={{
-          top: "calc(var(--nav-bottom, 68px) - 6px)",
-          pointerEvents: isOpen ? "auto" : "none",
-        }}
-      />
+      {mounted &&
+        createPortal(
+          <div onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+            {/* Hover bridge — lets the mouse travel from the trigger down into the panel without closing */}
+            <div
+              aria-hidden="true"
+              className="fixed left-1/2 z-[60] h-6 w-[900px] max-w-[94vw] -translate-x-1/2"
+              style={{
+                top: "calc(var(--nav-bottom, 68px) - 6px)",
+                pointerEvents: isOpen ? "auto" : "none",
+              }}
+            />
 
-      {/* Dropdown panel — fixed to the viewport so it's truly centered on screen */}
-      <div
-        className="fixed left-1/2 z-50 -translate-x-1/2"
-        style={{
-          top: "var(--nav-bottom, 72px)",
-          opacity: isOpen ? 1 : 0,
-          pointerEvents: isOpen ? "auto" : "none",
-          transform: `translateX(-50%) translateY(${isOpen ? "0px" : "-6px"})`,
-          transition: `opacity 0.28s ${EASE}, transform 0.28s ${EASE}`,
-        }}
-      >
+            {/* Dropdown panel — portaled to <body> so it escapes the header's transformed ancestor and is truly viewport-centered */}
+            <div
+              className="fixed left-1/2 z-[70]"
+              style={{
+                top: "var(--nav-bottom, 72px)",
+                opacity: isOpen ? 1 : 0,
+                pointerEvents: isOpen ? "auto" : "none",
+                transform: `translateX(-50%) translateY(${isOpen ? "0px" : "-6px"})`,
+                transition: `opacity 0.28s ${EASE}, transform 0.28s ${EASE}`,
+              }}
+            >
         <div
           className="w-[860px] max-w-[94vw] overflow-hidden rounded-2xl border border-black/5 bg-white/95 backdrop-blur-xl shadow-[0_24px_60px_-12px_rgba(0,0,0,0.18),0_8px_20px_-8px_rgba(0,0,0,0.08)]"
           style={{
@@ -360,6 +368,9 @@ export default function MarketingBlogDropdown({
           </div>
         </div>
       </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
