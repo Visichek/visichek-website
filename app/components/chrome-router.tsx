@@ -12,6 +12,7 @@ interface ChromeRouterProps {
 }
 
 const MARKETING_ROUTES = new Set(["/", "/pricing", "/blog", "/privacy", "/terms", "/dpa"]);
+const MARKETING_PREFIXES = ["/blog", "/blogs", "/articles"];
 
 export default function ChromeRouter({
   children,
@@ -21,7 +22,11 @@ export default function ChromeRouter({
   marketingFooter,
 }: ChromeRouterProps) {
   const pathname = usePathname();
-  const isMarketingRoute = MARKETING_ROUTES.has(pathname);
+  const isMarketingRoute =
+    MARKETING_ROUTES.has(pathname) ||
+    MARKETING_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    );
 
   if (isMarketingRoute) {
     return (

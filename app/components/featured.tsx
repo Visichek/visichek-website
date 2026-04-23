@@ -1,5 +1,6 @@
 import BillboardHero from "./leadstory";
 import PortraitStoryCard from "./portraitstorycard";
+import BlogSectionHeader from "./blogsectionheader";
 import { Blog } from "../types/blog";
 import { BASE_URL } from "../util/api";
 
@@ -12,8 +13,8 @@ const Featured = async () => {
 
   if (!res.ok) {
     return (
-      <section className="py-10 text-center text-gray-500">
-        <p>Failed to load recent stories.</p>
+      <section className="py-10 text-center text-[#6a6a6a]">
+        <p>Failed to load featured stories.</p>
       </section>
     );
   }
@@ -24,7 +25,7 @@ const Featured = async () => {
   } catch (error) {
     console.error("Failed to parse featured stories data:", error);
     return (
-      <section className="py-10 text-center text-gray-500">
+      <section className="py-10 text-center text-[#6a6a6a]">
         <p>Something went wrong loading the content.</p>
       </section>
     );
@@ -32,11 +33,13 @@ const Featured = async () => {
 
   if (blogs.length === 0) {
     return (
-      <section className="bg-white px-5 md:px-32 pt-16 pb-10">
-        <div className="flex justify-between items-center border-b border-b-gray-300 pt-2 pb-3">
-          <p className="text-sm font-semibold text-black">FEATURED STORY</p>
-        </div>
-        <p className="py-10 text-center text-[15px] text-gray-500">
+      <section className="bg-white px-5 md:px-10 lg:px-16 pt-16 pb-12">
+        <BlogSectionHeader
+          eyebrow="Featured"
+          title="Hand-picked stories"
+          description="Editorial favourites chosen by the VisiChek team."
+        />
+        <p className="py-10 text-center text-[14px] text-[#6a6a6a]">
           No featured stories yet — check back later.
         </p>
       </section>
@@ -47,20 +50,27 @@ const Featured = async () => {
   const portraitStoryData = blogs.slice(1, 4);
 
   return (
-    <section className="bg-white px-5 md:px-32 pt-16">
-      <div className="flex justify-between items-center border-b border-b-gray-300 pt-2 pb-3 sticky top-[78px] lg:top-[70px] z-40 bg-white">
-        <p className="text-sm font-semibold text-black">FEATURED STORY</p>
-      </div>
-      <div>
-        <BillboardHero
-          title={billBoardFeaturedData.title}
-          excerpt={billBoardFeaturedData.excerpt}
-          author={billBoardFeaturedData.author.name}
-          imageUrl={billBoardFeaturedData.featureImage.url}
-          href={`/blogs/${billBoardFeaturedData.id}`}
-        />
-      </div>
-      <div className="flex flex-col lg:flex-row gap-6 mt-5 pb-10">
+    <section className="bg-white px-5 md:px-10 lg:px-16 pt-16">
+      <BlogSectionHeader
+        eyebrow="Featured"
+        title="Hand-picked stories"
+        description="Editorial favourites chosen by the VisiChek team."
+        actionLabel="View all"
+        actionHref="/blog#latest"
+        sticky
+      />
+      <BillboardHero
+        title={billBoardFeaturedData.title}
+        excerpt={billBoardFeaturedData.excerpt}
+        author={billBoardFeaturedData.author.name}
+        imageUrl={billBoardFeaturedData.featureImage.url}
+        href={`/blogs/${billBoardFeaturedData.id}`}
+        eyebrow="Featured story"
+        categoryName={billBoardFeaturedData.category?.name}
+        categorySlug={billBoardFeaturedData.category?.slug}
+        dateCreated={billBoardFeaturedData.dateCreated}
+      />
+      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3 pb-20">
         {portraitStoryData.map((data) => (
           <PortraitStoryCard
             key={data.slug}
@@ -69,6 +79,9 @@ const Featured = async () => {
             excerpt={data.excerpt}
             author={data.author.name}
             href={`/blogs/${data.id}`}
+            categoryName={data.category?.name}
+            categorySlug={data.category?.slug}
+            dateCreated={data.dateCreated}
           />
         ))}
       </div>

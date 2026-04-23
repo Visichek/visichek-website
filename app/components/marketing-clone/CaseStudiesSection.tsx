@@ -39,7 +39,7 @@ const benefits: BenefitCard[] = [
 
 export function CaseStudiesSection() {
   return (
-    <section className="px-6 py-20">
+    <section id="case-studies" className="px-6 py-20">
       <div className="mx-auto max-w-[1200px]">
         {/* Section header */}
         <div className="mx-auto mb-12 max-w-2xl text-center">

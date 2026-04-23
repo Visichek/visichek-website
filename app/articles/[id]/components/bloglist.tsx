@@ -49,12 +49,19 @@ const BlogList = ({
   };
 
   return (
-    <div className="px-5 lg:px-28 2xl:px-36 mt-6">
-      <div className="flex justify-start items-center border-b border-b-gray-300 pt-2 pb-3 sticky top-[78px] lg:top-[70px] z-40 bg-white">
-        <p className="text-sm font-semibold text-black">ALL ARTICLES</p>
+    <div className="mx-auto max-w-[1200px] px-5 md:px-8 pb-20">
+      <div className="sticky top-[78px] lg:top-[70px] z-40 flex items-end justify-between border-b border-[#e8e8e8] bg-white/85 backdrop-blur pb-4 pt-5">
+        <div>
+          <p className="mb-1 text-[11.5px] font-semibold uppercase tracking-widest text-[#3A9615]">
+            All articles
+          </p>
+          <h2 className="font-serif text-[22px] md:text-[26px] font-bold tracking-[-0.02em] text-[#1a1a1a]">
+            {blogs.length} {blogs.length === 1 ? "story" : "stories"} in this topic
+          </h2>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-5">
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {blogs.map((blog, index) => (
           <CategoryCard
             key={index}
@@ -63,21 +70,24 @@ const BlogList = ({
             excerpt={blog.excerpt}
             author={blog.author.name}
             href={`/blogs/${blog.id}`}
+            categoryName={blog.category?.name}
+            categorySlug={blog.category?.slug}
+            dateCreated={blog.dateCreated}
           />
         ))}
       </div>
 
       {hasMore && (
-        <div className="flex justify-center items-center py-8">
+        <div className="flex items-center justify-center py-10">
           <NextButton onClick={loadMore} disabled={isLoading}>
-            {isLoading ? "Loading..." : "Next"}
+            {isLoading ? "Loading…" : "Load more"}
           </NextButton>
         </div>
       )}
 
       {!hasMore && (
-        <p className="text-center py-8 text-gray-500">
-          You've reached the end!
+        <p className="py-10 text-center text-[14px] text-[#6a6a6a]">
+          You&apos;ve reached the end.
         </p>
       )}
     </div>

@@ -41,14 +41,14 @@ const CategoryPage: React.FC<Props> = async ({ params }) => {
 
   if (blogs.length === 0) {
     return (
-      <section>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="text-gray-400 text-lg mb-2">📭</div>
-          <h3 className="text-white text-xl font-semibold mb-2">
-            No categories found
+      <section className="bg-white min-h-[60vh] pt-[120px] pb-16">
+        <div className="mx-auto max-w-[560px] px-6 text-center">
+          <div className="text-4xl mb-3">📭</div>
+          <h3 className="font-serif text-[24px] md:text-[28px] font-bold tracking-[-0.02em] text-[#1a1a1a] mb-2">
+            No articles yet
           </h3>
-          <p className="text-gray-400">
-            We couldn't find any categories matching your criteria.
+          <p className="text-[15px] leading-relaxed text-[#6a6a6a]">
+            We couldn&apos;t find any articles in this category. Check back soon.
           </p>
         </div>
       </section>

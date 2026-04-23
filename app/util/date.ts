@@ -10,4 +10,14 @@ const formatDate = (timestamp: number) => {
   }).format(date);
 };
 
-export { formatDate };
+/** Compact date like "Apr 23, 2026" — use for card meta bars. */
+const formatDateShort = (timestamp: number) => {
+  const date = new Date(timestamp * 1000);
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+};
+
+export { formatDate, formatDateShort };

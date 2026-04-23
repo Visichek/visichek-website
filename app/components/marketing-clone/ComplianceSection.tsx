@@ -37,7 +37,7 @@ const complianceCards = [
 
 export function ComplianceSection() {
   return (
-    <section className="py-24 bg-white border-y border-[#e8e8e8]">
+    <section id="compliance" className="py-24 bg-white border-y border-[#e8e8e8]">
       <div className="max-w-6xl mx-auto px-6">
         <RevealWrapper>
           <div className="text-center mb-16">

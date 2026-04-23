@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import dynamic from "next/dynamic";
+import MarketingBlogDropdown from "./marketing-blog-dropdown";
 
 const GlassSurface = dynamic(() => import("@/components/GlassSurface"), {
   ssr: false,
@@ -177,24 +178,24 @@ export default function MarketingHeader() {
     ? [
         { label: "Overview", href: "#overview" },
         { label: "Features", href: "#features" },
+        { label: "Security", href: "#compliance" },
         { label: "Pricing", href: "/pricing#pricing" },
         { label: "Waitlist", href: "#waitlist" },
-        { label: "Blogs", href: "/blog" },
       ]
     : isPricing
       ? [
           { label: "Overview", href: "/#overview" },
           { label: "Features", href: "/#features" },
+          { label: "Security", href: "/#compliance" },
           { label: "Pricing", href: "#pricing" },
           { label: "Waitlist", href: "#waitlist" },
-          { label: "Blogs", href: "/blog" },
         ]
       : [
           { label: "Overview", href: "/#overview" },
           { label: "Features", href: "/#features" },
+          { label: "Security", href: "/#compliance" },
           { label: "Pricing", href: "/pricing#pricing" },
           { label: "Waitlist", href: "/#waitlist" },
-          { label: "Blogs", href: "/blog" },
         ];
 
   const sectionHrefs = links.map((l) => l.href);
@@ -380,7 +381,7 @@ export default function MarketingHeader() {
             </Link>
 
             {/* Desktop links */}
-            <nav className="hidden items-center gap-7 lg:flex">
+            <nav className="hidden items-center gap-6 lg:flex">
               {links.map((l) => (
                 <NavLink
                   key={l.label}
@@ -391,6 +392,14 @@ export default function MarketingHeader() {
                   {l.label}
                 </NavLink>
               ))}
+              <MarketingBlogDropdown
+                isActive={
+                  pathname === "/blog" ||
+                  pathname.startsWith("/blogs") ||
+                  pathname.startsWith("/articles")
+                }
+                isGlass={isScrolled}
+              />
             </nav>
 
             {/* Actions */}
@@ -501,6 +510,34 @@ export default function MarketingHeader() {
                 </Link>
               );
             })}
+            {/* Blog — mobile (single link back to the Blog hub) */}
+            <Link
+              href="/blog"
+              onClick={closeMobile}
+              className="rounded-lg px-4 py-3 text-[15px] transition-colors"
+              style={{
+                fontWeight:
+                  pathname === "/blog" ||
+                  pathname.startsWith("/blogs") ||
+                  pathname.startsWith("/articles")
+                    ? 600
+                    : 500,
+                color:
+                  pathname === "/blog" ||
+                  pathname.startsWith("/blogs") ||
+                  pathname.startsWith("/articles")
+                    ? "#2e7a11"
+                    : "#1f2937",
+                background:
+                  pathname === "/blog" ||
+                  pathname.startsWith("/blogs") ||
+                  pathname.startsWith("/articles")
+                    ? "rgba(58,150,21,0.07)"
+                    : "transparent",
+              }}
+            >
+              Blog
+            </Link>
           </nav>
 
           <div className="mt-auto border-t border-black/5 p-3 flex flex-col gap-2">

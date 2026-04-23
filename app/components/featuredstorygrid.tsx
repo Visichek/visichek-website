@@ -7,9 +7,10 @@ interface IFeaturedStoryGridProps {
 }
 
 const FeaturedStoryGrid: React.FC<IFeaturedStoryGridProps> = ({ blogs }) => {
+  if (!blogs?.length) return null;
   return (
-    <section className="pt-2">
-      <div className="flex flex-col md:flex-row gap-2">
+    <section className="bg-white px-5 md:px-10 lg:px-16 pt-6">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {blogs.map((blog) => (
           <FeaturedStoryCard
             key={blog.id}
@@ -17,6 +18,10 @@ const FeaturedStoryGrid: React.FC<IFeaturedStoryGridProps> = ({ blogs }) => {
             headerText={blog.title}
             paragraphText={blog.excerpt}
             href={`/blogs/${blog.id}`}
+            categoryName={blog.category?.name}
+            categorySlug={blog.category?.slug}
+            dateCreated={blog.dateCreated}
+            author={blog.author?.name}
           />
         ))}
       </div>

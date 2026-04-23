@@ -1,4 +1,4 @@
-import { Blog, HeroSectionResponse } from "../types/blog";
+import { Blog } from "../types/blog";
 import { BASE_URL } from "../util/api";
 import ArticleLinkCard from "./articlelinkcard";
 import FeaturedStoryGrid from "./featuredstorygrid";
@@ -12,7 +12,7 @@ const HeroSection = async () => {
 
   if (!res.ok) {
     return (
-      <section className="py-10 text-center text-gray-500">
+      <section className="py-10 text-center text-[#6a6a6a]">
         <p>Failed to load featured stories.</p>
       </section>
     );
@@ -26,7 +26,7 @@ const HeroSection = async () => {
   } catch (error) {
     console.error("Failed to parse hero section data:", error);
     return (
-      <section className="py-10 text-center text-gray-500">
+      <section className="py-10 text-center text-[#6a6a6a]">
         <p>Something went wrong loading the content.</p>
       </section>
     );
@@ -34,9 +34,9 @@ const HeroSection = async () => {
 
   if (blogs.length === 0) {
     return (
-      <section className="px-5 md:px-32 py-16 text-center">
-        <div className="mx-auto max-w-md rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10">
-          <p className="text-[15px] text-gray-600">
+      <section className="px-5 md:px-10 lg:px-16 py-16 text-center">
+        <div className="mx-auto max-w-md rounded-2xl border border-dashed border-[#e8e8e8] bg-[#fafafa] p-10">
+          <p className="text-[14px] text-[#6a6a6a]">
             No articles available yet — check back later.
           </p>
         </div>
@@ -54,6 +54,11 @@ const HeroSection = async () => {
         href={`/blogs/${mainArticle.id}`}
         title={mainArticle.title}
         author={mainArticle.author.name}
+        authorAvatar={mainArticle.author.avatarUrl}
+        excerpt={mainArticle.excerpt}
+        categoryName={mainArticle.category?.name}
+        categorySlug={mainArticle.category?.slug}
+        dateCreated={mainArticle.dateCreated}
       />
       <FeaturedStoryGrid blogs={featuredArticles} />
     </section>
