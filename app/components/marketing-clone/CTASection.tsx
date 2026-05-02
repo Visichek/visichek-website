@@ -20,7 +20,7 @@ export function CTASection() {
             clean audit trails.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <OpenGetStartedButton className="bg-[#2a2a2a] text-white font-semibold px-10 py-4 rounded-[20px] text-[15px] hover:bg-[#4a4a4a] active:scale-[0.98] transition-all duration-100 inline-block">
+            <OpenGetStartedButton className="bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] text-white font-semibold px-10 py-4 rounded-[20px] text-[15px] shadow-md shadow-green-700/20 hover:-translate-y-px hover:shadow-lg hover:shadow-green-600/30 active:scale-[0.98] transition-all duration-150 inline-block">
               Get started
             </OpenGetStartedButton>
             <a

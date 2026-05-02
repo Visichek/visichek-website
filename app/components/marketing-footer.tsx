@@ -162,65 +162,20 @@ export default function MarketingFooter() {
         className="bg-white border-t border-border py-14"
       >
         <div className="max-w-6xl mx-auto px-6">
-          <div className="waitlist-card mb-14 reveal visible">
-            <div>
-              <p className="label-tag mb-2">Get started</p>
-              <h3 className="font-serif text-[28px] md:text-[34px] text-charcoal tracking-[-0.02em]">
-                Get started with VisiChek
-              </h3>
-              <p className="text-[14px] text-charcoal-lighter mt-2 max-w-md">
-                Tell us about your organization and we&apos;ll get you set up
-                with the right plan and onboarding support.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-              <button
-                type="button"
-                onClick={openModal}
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-6 py-3 text-[14px] font-semibold text-white shadow-md shadow-green-700/15 transition-all duration-200 hover:-translate-y-px hover:shadow-lg"
-              >
-                Get started
-              </button>
-              <a
-                href={SALES_MAILTO}
-                className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-6 py-3 text-[14px] font-medium text-gray-800 hover:bg-gray-50"
-              >
-                Talk to sales
-              </a>
-            </div>
-          </div>
-
           <div className="grid md:grid-cols-5 gap-10 mb-12">
             <div className="md:col-span-2">
               <Link
                 href="/"
-                className="mb-4 flex items-center gap-2 text-[17px] font-semibold text-charcoal"
+                className="mb-4 inline-flex items-center"
+                aria-label="VisiChek home"
               >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 28 28"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="14"
-                    cy="14"
-                    r="13"
-                    stroke="#3A9615"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M8 14L12 18L20 10"
-                    stroke="#3A9615"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="text-xl font-bold tracking-tight">
-                  VisiChek
-                </span>
+                <img
+                  src="/visichek-logomark.svg"
+                  alt="VisiChek"
+                  width={160}
+                  height={29}
+                  className="h-7 w-auto"
+                />
               </Link>
               <p className="text-[13px] text-charcoal-lighter leading-relaxed max-w-[260px]">
                 Visitor management for security-first workplaces, departments,
@@ -376,6 +331,7 @@ export default function MarketingFooter() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="get-started-modal-title"
+          data-lenis-prevent
         >
           <div
             className={`absolute inset-0 transition-all duration-350 ease-out ${
@@ -422,22 +378,14 @@ export default function MarketingFooter() {
 
                   <div className="flex items-center gap-2.5 mb-3">
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-50 ring-1 ring-green-200/60">
-                      <svg width="16" height="16" viewBox="0 0 28 28" fill="none">
-                        <circle
-                          cx="14"
-                          cy="14"
-                          r="13"
-                          stroke="#3A9615"
-                          strokeWidth="2"
-                        />
-                        <path
-                          d="M8 14L12 18L20 10"
-                          stroke="#3A9615"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                      <img
+                        src="/visichek-favicon.svg"
+                        alt=""
+                        width={16}
+                        height={16}
+                        className="h-4 w-4"
+                        aria-hidden="true"
+                      />
                     </span>
                     <span className="text-xs font-semibold uppercase tracking-widest text-[#3A9615]">
                       Get started

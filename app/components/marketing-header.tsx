@@ -16,21 +16,6 @@ const EASE = "cubic-bezier(0.16,1,0.3,1)";
 const SIGN_IN_URL = "https://client.visichek.app/app/login";
 const SALES_MAILTO = "mailto:sales@visichek.com?subject=Contact%20sales";
 
-function LogoMark() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
-      <circle cx="14" cy="14" r="13" stroke="#3A9615" strokeWidth="2" />
-      <path
-        d="M8 14L12 18L20 10"
-        stroke="#3A9615"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 /* ─── Nav link with active state ─── */
 function NavLink({
   href,
@@ -174,26 +159,23 @@ export default function MarketingHeader() {
 
   const links = isHome
     ? [
-        { label: "Overview", href: "#overview" },
         { label: "Features", href: "#features" },
+        { label: "Services", href: "#services" },
         { label: "Security", href: "#compliance" },
         { label: "Pricing", href: "/pricing#pricing" },
-        { label: "Get started", href: "#get-started" },
       ]
     : isPricing
       ? [
-          { label: "Overview", href: "/#overview" },
           { label: "Features", href: "/#features" },
+          { label: "Services", href: "/#services" },
           { label: "Security", href: "/#compliance" },
           { label: "Pricing", href: "#pricing" },
-          { label: "Get started", href: "#get-started" },
         ]
       : [
-          { label: "Overview", href: "/#overview" },
           { label: "Features", href: "/#features" },
+          { label: "Services", href: "/#services" },
           { label: "Security", href: "/#compliance" },
           { label: "Pricing", href: "/pricing#pricing" },
-          { label: "Get started", href: "/#get-started" },
         ];
 
   const sectionHrefs = links.map((l) => l.href);
@@ -241,6 +223,10 @@ export default function MarketingHeader() {
   }, [mobileOpen]);
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
+
+  const openGetStarted = useCallback(() => {
+    window.dispatchEvent(new Event("visicheck:open-getstarted"));
+  }, []);
 
   const barH = isScrolled ? 60 : 72;
   const barR = isScrolled ? 24 : 0;
@@ -375,13 +361,24 @@ export default function MarketingHeader() {
             }}
           >
             {/* Brand */}
-            <Link href="/" className="flex shrink-0 items-center gap-2.5">
-             
+            <Link
+              href="/"
+              className="flex shrink-0 items-center gap-2"
+              aria-label="VisiChek home"
+            >
+              <img
+                src="/visichek-favicon.svg"
+                alt=""
+                width={22}
+                height={22}
+                className="h-[22px] w-[22px]"
+                aria-hidden="true"
+              />
               <span
-                className="font-semibold tracking-tight text-green-500 transition-colors duration-300"
+                className="font-semibold tracking-tight transition-colors duration-300"
                 style={{
                   fontSize: "17px",
-                  color: isScrolled ?  "#359300": "#000000",
+                  color: isScrolled ? "#359300" : "#000000",
                 }}
               >
                 VisiChek
@@ -401,6 +398,32 @@ export default function MarketingHeader() {
                     {l.label}
                   </NavLink>
                 ))}
+                <button
+                  type="button"
+                  onClick={openGetStarted}
+                  className="group relative flex items-center"
+                >
+                  <span
+                    className="absolute -inset-x-2.5 -inset-y-1 rounded-full transition-all duration-300"
+                    style={{
+                      background: "transparent",
+                      border: "1px solid transparent",
+                      transitionTimingFunction: EASE,
+                    }}
+                  />
+                  <span
+                    className="relative z-[1] transition-all duration-300"
+                    style={{
+                      fontSize: "13.5px",
+                      fontWeight: 500,
+                      color: isScrolled ? "#1f2937" : "#4b5563",
+                      transitionTimingFunction: EASE,
+                    }}
+                  >
+                    Get started
+                  </span>
+                  <span className="absolute inset-x-0 -bottom-0.5 h-[2px] origin-center scale-x-0 rounded-full bg-[#3A9615]/40 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
+                </button>
                 <MarketingBlogDropdown
                   isActive={
                     pathname === "/blog" ||
@@ -487,9 +510,19 @@ export default function MarketingHeader() {
           }}
         >
           <div className="flex items-center justify-between px-5 h-[60px] border-b border-black/5">
-            <span className="font-semibold text-[#359300] text-[17px]">
-              VisiChek
-            </span>
+            <Link href="/" onClick={closeMobile} className="flex items-center gap-2">
+              <img
+                src="/visichek-favicon.svg"
+                alt=""
+                width={22}
+                height={22}
+                className="h-[22px] w-[22px]"
+                aria-hidden="true"
+              />
+              <span className="font-semibold text-[#359300] text-[17px]">
+                VisiChek
+              </span>
+            </Link>
             <button
               type="button"
               onClick={closeMobile}
@@ -519,6 +552,21 @@ export default function MarketingHeader() {
                 </Link>
               );
             })}
+            <button
+              type="button"
+              onClick={() => {
+                closeMobile();
+                openGetStarted();
+              }}
+              className="rounded-lg px-4 py-3 text-[15px] text-left transition-colors"
+              style={{
+                fontWeight: 500,
+                color: "#1f2937",
+                background: "transparent",
+              }}
+            >
+              Get started
+            </button>
             {/* Blog — mobile (single link back to the Blog hub) */}
             <Link
               href="/blog"

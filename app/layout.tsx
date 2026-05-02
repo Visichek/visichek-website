@@ -90,10 +90,11 @@ export const metadata: Metadata = {
     siteName: "VisiChek",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/visichek-social-share.svg",
         width: 1200,
         height: 630,
         alt: "VisiChek visitor management platform",
+        type: "image/svg+xml",
       },
     ],
     locale: "en_US",
@@ -104,7 +105,7 @@ export const metadata: Metadata = {
     title: "VisiChek",
     description:
       "Visitor management for modern facilities, compliance, and workplace operations.",
-    images: ["/logo-footer.png"],
+    images: ["/visichek-social-share.svg"],
   },
   keywords: [
     "visitor management system",
@@ -119,7 +120,12 @@ export const metadata: Metadata = {
     "facility operations",
   ],
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/visichek-favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
     shortcut: "/favicon-32x32.png",
     apple: "/apple-touch-icon.png",
   },

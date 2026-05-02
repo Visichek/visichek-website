@@ -13,7 +13,7 @@ export default function MarketingHomePage() {
     <main>
       <HeroSection />
       <EnterpriseFeaturesSection />
-      <div className="sticky-container">
+      <div id="services" className="sticky-container">
         <BillingAutomationSection />
         <PricingEngineSection />
         <InvoicingSection />
