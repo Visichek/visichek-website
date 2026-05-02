@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import OpenSalesButton from "../open-sales-button";
+import OpenGetStartedButton from "../open-sales-button";
 import { cn } from "@/lib/utils";
+
+const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
 
 export function HeroSection() {
   return (
@@ -49,8 +50,7 @@ export function HeroSection() {
 
         {/* CTA Buttons */}
         <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 sm:gap-4 w-full max-w-[420px] sm:max-w-none mx-auto">
-          <Link
-            href="/pricing#pricing"
+          <OpenGetStartedButton
             className={cn(
               "inline-flex items-center justify-center rounded-full",
               "bg-[#3A9615] px-6 py-3 text-base font-medium text-white",
@@ -59,9 +59,10 @@ export function HeroSection() {
               "w-full sm:w-auto"
             )}
           >
-            Get Early Access
-          </Link>
-          <OpenSalesButton
+            Get started
+          </OpenGetStartedButton>
+          <a
+            href={SALES_MAILTO}
             className={cn(
               "inline-flex items-center justify-center rounded-full",
               "px-6 py-3 text-base font-medium text-[#18321c]",
@@ -69,8 +70,8 @@ export function HeroSection() {
               "w-full sm:w-auto"
             )}
           >
-            Contact sales &rarr;
-          </OpenSalesButton>
+            Talk to sales &rarr;
+          </a>
         </div>
        </div>
       </div>

@@ -4,7 +4,8 @@
       "Bash(curl -s https://blog.visichek.app/api/v1/articles)",
       "Bash(curl -s \"https://blog.visichek.app/api/v1/blogs?limit=1\")",
       "Bash(curl -s \"https://blog.visichek.app/api/v1/articles?limit=1\")",
-      "Bash(curl -s \"https://blog.visichek.app/api/v1/articles/content/?stop=2\")"
+      "Bash(curl -s \"https://blog.visichek.app/api/v1/articles/content/?stop=2\")",
+      "Bash(npx --no-install tsc --noEmit)"
     ]
   }
 }

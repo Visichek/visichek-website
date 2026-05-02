@@ -13,10 +13,8 @@ const GlassSurface = dynamic(() => import("@/components/GlassSurface"), {
 
 const SCROLL_THRESHOLD = 50;
 const EASE = "cubic-bezier(0.16,1,0.3,1)";
-
-function openSalesModal() {
-  window.dispatchEvent(new Event("visicheck:open-sales"));
-}
+const SIGN_IN_URL = "https://client.visichek.app/app/login";
+const SALES_MAILTO = "mailto:sales@visichek.com?subject=Contact%20sales";
 
 function LogoMark() {
   return (
@@ -180,7 +178,7 @@ export default function MarketingHeader() {
         { label: "Features", href: "#features" },
         { label: "Security", href: "#compliance" },
         { label: "Pricing", href: "/pricing#pricing" },
-        { label: "Waitlist", href: "#waitlist" },
+        { label: "Get started", href: "#get-started" },
       ]
     : isPricing
       ? [
@@ -188,14 +186,14 @@ export default function MarketingHeader() {
           { label: "Features", href: "/#features" },
           { label: "Security", href: "/#compliance" },
           { label: "Pricing", href: "#pricing" },
-          { label: "Waitlist", href: "#waitlist" },
+          { label: "Get started", href: "#get-started" },
         ]
       : [
           { label: "Overview", href: "/#overview" },
           { label: "Features", href: "/#features" },
           { label: "Security", href: "/#compliance" },
           { label: "Pricing", href: "/pricing#pricing" },
-          { label: "Waitlist", href: "/#waitlist" },
+          { label: "Get started", href: "/#get-started" },
         ];
 
   const sectionHrefs = links.map((l) => l.href);
@@ -416,9 +414,8 @@ export default function MarketingHeader() {
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={openSalesModal}
+              <a
+                href={SALES_MAILTO}
                 className="hidden rounded-full px-4 py-[7px] text-[13px] font-medium transition-all duration-200 hover:shadow-sm md:inline-flex"
                 style={{
                   border: isScrolled
@@ -431,14 +428,14 @@ export default function MarketingHeader() {
                   transition: `all 0.4s ${EASE}`,
                 }}
               >
-                Contact Sales
-              </button>
-              <Link
-                href="/pricing#pricing"
+                Contact sales
+              </a>
+              <a
+                href={SIGN_IN_URL}
                 className="inline-flex items-center rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-4 py-[7px] text-[13px] font-semibold text-white shadow-sm shadow-green-700/15 transition-all duration-200 hover:-translate-y-px hover:shadow-md hover:shadow-green-600/20"
               >
-                Get Pricing
-              </Link>
+                Sign in
+              </a>
               <button
                 type="button"
                 onClick={() => setMobileOpen((v) => !v)}
@@ -553,23 +550,20 @@ export default function MarketingHeader() {
           </nav>
 
           <div className="mt-auto border-t border-black/5 p-3 flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                closeMobile();
-                openSalesModal();
-              }}
-              className="w-full rounded-full border border-black/10 bg-white px-4 py-3 text-[14px] font-medium text-gray-800 hover:bg-gray-50"
+            <a
+              href={SALES_MAILTO}
+              onClick={closeMobile}
+              className="w-full text-center rounded-full border border-black/10 bg-white px-4 py-3 text-[14px] font-medium text-gray-800 hover:bg-gray-50"
             >
-              Contact Sales
-            </button>
-            <Link
-              href="/pricing#pricing"
+              Contact sales
+            </a>
+            <a
+              href={SIGN_IN_URL}
               onClick={closeMobile}
               className="w-full flex items-center justify-center rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-4 py-3 text-[14px] font-semibold text-white shadow-sm shadow-green-700/15"
             >
-              Get Pricing
-            </Link>
+              Sign in
+            </a>
           </div>
         </aside>
       </div>

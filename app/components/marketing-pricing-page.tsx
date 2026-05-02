@@ -1,6 +1,8 @@
 import { AutomationsSection } from "./marketing-clone/AutomationsSection";
 import { CTASection } from "./marketing-clone/CTASection";
-import OpenSalesButton from "./open-sales-button";
+import OpenGetStartedButton from "./open-sales-button";
+
+const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
 
 const basicFeatures = [
   "QR code visitor registration",
@@ -88,12 +90,9 @@ export default function MarketingPricingPage() {
                     API access for integrations
                   </p>
                 </div>
-                <a
-                  href="#waitlist"
-                  className="block text-center border-[1.5px] border-[#e8e8e8] text-[#2a2a2a] text-[13.5px] font-semibold py-3 rounded-[20px] mt-6 hover:border-[#2a2a2a] hover:bg-gray-50 transition-all duration-150"
-                >
-                  Join waitlist
-                </a>
+                <OpenGetStartedButton className="block w-full text-center border-[1.5px] border-[#e8e8e8] text-[#2a2a2a] text-[13.5px] font-semibold py-3 rounded-[20px] mt-6 hover:border-[#2a2a2a] hover:bg-gray-50 transition-all duration-150">
+                  Get started
+                </OpenGetStartedButton>
               </div>
             </div>
 
@@ -129,9 +128,12 @@ export default function MarketingPricingPage() {
                     Private cloud deployment · API access for integrations
                   </p>
                 </div>
-                <OpenSalesButton className="block w-full text-center bg-green-700 text-white text-[13.5px] font-semibold py-3 rounded-[20px] mt-6 hover:bg-green-800 transition-all duration-150">
+                <a
+                  href={SALES_MAILTO}
+                  className="block w-full text-center bg-green-700 text-white text-[13.5px] font-semibold py-3 rounded-[20px] mt-6 hover:bg-green-800 transition-all duration-150"
+                >
                   Talk to sales
-                </OpenSalesButton>
+                </a>
               </div>
             </div>
           </div>

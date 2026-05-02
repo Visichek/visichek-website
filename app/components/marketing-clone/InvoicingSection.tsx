@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import OpenGetStartedButton from "../open-sales-button";
 import { RevealWrapper } from "./BillingAutomationSection";
 import CardSwap, { Card } from "@/components/ui/card-swap";
 
@@ -185,12 +185,9 @@ export function InvoicingSection() {
               </li>
             ))}
           </ul>
-          <Link
-            href="#waitlist"
-            className="inline-flex items-center gap-1.5 bg-green-700 text-white text-[13.5px] font-semibold px-[22px] py-2.5 rounded-[20px] hover:bg-green-800 active:scale-[0.97] transition-all duration-150"
-          >
-            Join waitlist
-          </Link>
+          <OpenGetStartedButton className="inline-flex items-center gap-1.5 bg-green-700 text-white text-[13.5px] font-semibold px-[22px] py-2.5 rounded-[20px] hover:bg-green-800 active:scale-[0.97] transition-all duration-150">
+            Get started
+          </OpenGetStartedButton>
         </RevealWrapper>
 
         <RevealWrapper delay={100} className="hidden md:block">

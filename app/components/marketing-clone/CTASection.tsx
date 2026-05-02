@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import OpenSalesButton from "../open-sales-button";
+import OpenGetStartedButton from "../open-sales-button";
 import { RevealWrapper } from "./BillingAutomationSection";
+
+const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
 
 export function CTASection() {
   return (
@@ -19,19 +20,19 @@ export function CTASection() {
             clean audit trails.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="#waitlist"
-              className="bg-[#2a2a2a] text-white font-semibold px-10 py-4 rounded-[20px] text-[15px] hover:bg-[#4a4a4a] active:scale-[0.98] transition-all duration-100 inline-block"
+            <OpenGetStartedButton className="bg-[#2a2a2a] text-white font-semibold px-10 py-4 rounded-[20px] text-[15px] hover:bg-[#4a4a4a] active:scale-[0.98] transition-all duration-100 inline-block">
+              Get started
+            </OpenGetStartedButton>
+            <a
+              href={SALES_MAILTO}
+              className="border border-[#e8e8e8] text-[#2a2a2a] font-semibold px-10 py-4 rounded-[20px] text-[15px] hover:bg-gray-50 active:scale-[0.98] transition-all duration-100 inline-block"
             >
-              Join waitlist
-            </Link>
-            <OpenSalesButton className="border border-[#e8e8e8] text-[#2a2a2a] font-semibold px-10 py-4 rounded-[20px] text-[15px] hover:bg-gray-50 active:scale-[0.98] transition-all duration-100 inline-block">
-              Contact Sales
-            </OpenSalesButton>
+              Talk to sales
+            </a>
           </div>
           <p className="mt-5 text-[12px] text-[#6a6a6a]">
-            Work in progress &middot; We&apos;ll notify you when early access
-            opens
+            Tell us about your workflow &middot; We&apos;ll set you up with the
+            right plan
           </p>
         </div>
       </RevealWrapper>
