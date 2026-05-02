@@ -28,7 +28,7 @@ export function HeroSection() {
         {/* Headline */}
         <h1
           className={cn(
-            "mx-auto max-w-[800px] font-sans font-bold leading-tight tracking-tight",
+            "mx-auto max-w-[800px] font-serif leading-tight tracking-[-0.02em]",
             "text-[32px] md:text-[52px]",
             "text-[#18321c]"
           )}

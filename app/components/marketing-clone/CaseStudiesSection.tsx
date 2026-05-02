@@ -46,7 +46,7 @@ export function CaseStudiesSection() {
           <p className="mb-3 text-sm font-medium uppercase tracking-wide text-[#3A9615]">
             Measured operational improvements
           </p>
-          <h2 className="font-sans text-[32px] md:text-[40px] font-bold leading-tight text-[#222222]">
+          <h2 className="font-serif text-[32px] md:text-[40px] leading-tight tracking-[-0.02em] text-[#222222]">
             What changes when you use VisiChek
           </h2>
         </div>
