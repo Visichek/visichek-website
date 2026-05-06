@@ -363,26 +363,16 @@ export default function MarketingHeader() {
             {/* Brand */}
             <Link
               href="/"
-              className="flex shrink-0 items-center gap-2"
+              className="flex shrink-0 items-center"
               aria-label="VisiChek home"
             >
               <img
-                src="/visichek-favicon.svg"
-                alt=""
-                width={22}
-                height={22}
-                className="h-[22px] w-[22px]"
-                aria-hidden="true"
+                src="/visichek-logomark.svg"
+                alt="VisiChek"
+                width={114}
+                height={20}
+                className="h-5 w-auto"
               />
-              <span
-                className="font-semibold tracking-tight transition-colors duration-300"
-                style={{
-                  fontSize: "17px",
-                  color: isScrolled ? "#359300" : "#000000",
-                }}
-              >
-                VisiChek
-              </span>
             </Link>
 
             {/* Desktop links — absolutely centered so the group sits dead-centre regardless of brand/action widths */}
@@ -510,18 +500,14 @@ export default function MarketingHeader() {
           }}
         >
           <div className="flex items-center justify-between px-5 h-[60px] border-b border-black/5">
-            <Link href="/" onClick={closeMobile} className="flex items-center gap-2">
+            <Link href="/" onClick={closeMobile} className="flex items-center">
               <img
-                src="/visichek-favicon.svg"
-                alt=""
-                width={22}
-                height={22}
-                className="h-[22px] w-[22px]"
-                aria-hidden="true"
+                src="/visichek-logomark.svg"
+                alt="VisiChek"
+                width={114}
+                height={20}
+                className="h-5 w-auto"
               />
-              <span className="font-semibold text-[#359300] text-[17px]">
-                VisiChek
-              </span>
             </Link>
             <button
               type="button"

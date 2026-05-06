@@ -5,7 +5,10 @@ import { useEffect, useState, useRef, useCallback, FormEvent } from "react";
 import { X, Check } from "lucide-react";
 
 const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaqldaya";
+const ONBOARDING_ENDPOINT =
+  process.env.NEXT_PUBLIC_ONBOARDING_ENDPOINT ??
+  "https://api.visichek.com/v1/onboarding/submissions";
+const FORM_VERSION = "2026-05-01";
 const TURNSTILE_SITE_KEY = "0x4AAAAAADKLd7-DRWNPJLBG";
 const TURNSTILE_SCRIPT_ID = "cf-turnstile-script";
 const TURNSTILE_SCRIPT_SRC =
@@ -97,6 +100,25 @@ const TIMELINE_OPTIONS = [
   "Within 3-6 months",
   "Exploring options only",
 ];
+
+const FIELD_LABELS: Record<string, string> = {
+  full_name: "Full name",
+  work_email: "Work email",
+  phone_number: "Phone number",
+  role: "Your role",
+  organization_name: "Organization name",
+  country: "Country",
+  organization_type: "Type of organization",
+  current_method: "How visitors are managed today",
+  visitors_per_month: "Expected visitors per month",
+  departments: "Departments using VisiChek",
+  priorities: "Priorities",
+  access_control: "Existing access control",
+  timeline: "Deployment timeline",
+  marketing_opt_in: "Marketing opt-in",
+};
+
+const FIELD_ORDER: string[] = Object.keys(FIELD_LABELS);
 
 export default function MarketingFooter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -200,24 +222,55 @@ export default function MarketingFooter() {
         setSubmitState("error");
         return;
       }
+
       const formData = new FormData(form);
+      const payload: Record<string, string | string[]> = {};
+      for (const key of new Set(formData.keys())) {
+        const values = formData.getAll(key).map(String);
+        payload[key] = values.length > 1 ? values : values[0];
+      }
+
       setSubmitState("submitting");
       setErrorMsg("");
       try {
-        const res = await fetch(FORMSPREE_ENDPOINT, {
+        const res = await fetch(ONBOARDING_ENDPOINT, {
           method: "POST",
-          body: formData,
-          headers: { Accept: "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            form_version: FORM_VERSION,
+            payload,
+            field_labels: FIELD_LABELS,
+            field_order: FIELD_ORDER,
+            turnstile_token: turnstileToken,
+          }),
         });
+
         if (res.ok) {
           setSubmitState("success");
           form.reset();
         } else {
           const data = await res.json().catch(() => ({}));
-          setErrorMsg(
-            data?.errors?.[0]?.message ||
-              "Something went wrong. Please try again.",
-          );
+          const detailError = data?.details?.error;
+
+          let message: string;
+          if (data?.code === "FEATURE_DISABLED") {
+            message =
+              "Self-onboarding is paused — please email support@visichek.com.";
+          } else if (detailError === "turnstile_failed") {
+            message = "Security check failed. Please try again.";
+          } else if (detailError === "turnstile_unreachable") {
+            message =
+              "Security check is temporarily unavailable. Please try again.";
+          } else if (res.status === 429) {
+            message = "Too many requests. Please wait a moment and retry.";
+          } else {
+            message = "Something went wrong. Please try again.";
+          }
+
+          setErrorMsg(message);
           setSubmitState("error");
         }
       } catch {
