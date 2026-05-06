@@ -367,7 +367,7 @@ export default function MarketingHeader() {
               aria-label="VisiChek home"
             >
               <img
-                src="/visichek-logomark.svg"
+                src="/visichek-favicon.svg"
                 alt="VisiChek"
                 width={114}
                 height={20}
@@ -502,7 +502,7 @@ export default function MarketingHeader() {
           <div className="flex items-center justify-between px-5 h-[60px] border-b border-black/5">
             <Link href="/" onClick={closeMobile} className="flex items-center">
               <img
-                src="/visichek-logomark.svg"
+                src="/visichek-favicon.svg"
                 alt="VisiChek"
                 width={114}
                 height={20}
