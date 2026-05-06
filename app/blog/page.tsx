@@ -5,10 +5,39 @@ import BlogCategoryStrip from "../components/blogcategorystrip";
 import Link from "next/link";
 import { BASE_URL } from "../util/api";
 
+const blogTitle = "Blog | VisiChek";
+const blogDescription =
+  "Insights, guides, and stories about visitor management, workplace security, and facility operations — written by the team building VisiChek.";
+
 export const metadata = {
-  title: "Blog | VisiChek",
-  description:
-    "Insights, guides, and stories about visitor management, workplace security, and facility operations.",
+  title: blogTitle,
+  description: blogDescription,
+  alternates: { canonical: "/blog" },
+  openGraph: {
+    title: blogTitle,
+    description: blogDescription,
+    url: "https://visichek.app/blog",
+    siteName: "VisiChek",
+    type: "website",
+    locale: "en_US",
+    images: [
+      {
+        url: "/visichek-social-share.svg",
+        width: 1200,
+        height: 630,
+        alt: "VisiChek blog — visitor management insights",
+        type: "image/svg+xml",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@visichek",
+    creator: "@visichek",
+    title: blogTitle,
+    description: blogDescription,
+    images: ["/visichek-social-share.svg"],
+  },
 };
 
 /**

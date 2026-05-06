@@ -1,10 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+const termsTitle = "Terms of Service";
+const termsDescription =
+  "The terms and conditions governing your use of VisiChek — including acceptable use, data ownership, fees, service levels, and termination.";
+
 export const metadata: Metadata = {
-  title: "Terms of Service",
-  description:
-    "The terms and conditions governing your use of VisiChek.",
+  title: termsTitle,
+  description: termsDescription,
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: `${termsTitle} | VisiChek`,
+    description: termsDescription,
+    url: "https://visichek.app/terms",
+    siteName: "VisiChek",
+    type: "article",
+    locale: "en_US",
+    images: [
+      {
+        url: "/visichek-social-share.svg",
+        width: 1200,
+        height: 630,
+        alt: "VisiChek terms of service",
+        type: "image/svg+xml",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@visichek",
+    creator: "@visichek",
+    title: `${termsTitle} | VisiChek`,
+    description: termsDescription,
+    images: ["/visichek-social-share.svg"],
+  },
 };
 
 export default function TermsPage() {

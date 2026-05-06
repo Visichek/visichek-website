@@ -1,10 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+const privacyTitle = "Privacy Policy";
+const privacyDescription =
+  "How VisiChek collects, uses, stores, and protects your personal data — including NDPR compliance, data subject rights, and retention policies.";
+
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description:
-    "How VisiChek collects, uses, stores, and protects your personal data.",
+  title: privacyTitle,
+  description: privacyDescription,
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: `${privacyTitle} | VisiChek`,
+    description: privacyDescription,
+    url: "https://visichek.app/privacy",
+    siteName: "VisiChek",
+    type: "article",
+    locale: "en_US",
+    images: [
+      {
+        url: "/visichek-social-share.svg",
+        width: 1200,
+        height: 630,
+        alt: "VisiChek privacy policy",
+        type: "image/svg+xml",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@visichek",
+    creator: "@visichek",
+    title: `${privacyTitle} | VisiChek`,
+    description: privacyDescription,
+    images: ["/visichek-social-share.svg"],
+  },
 };
 
 export default function PrivacyPolicyPage() {

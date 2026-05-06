@@ -90,7 +90,7 @@ export default function MarketingPricingPage() {
                     API access for integrations
                   </p>
                 </div>
-                <OpenGetStartedButton className="block w-full text-center border-[1.5px] border-[#e8e8e8] text-[#2a2a2a] text-[13.5px] font-semibold py-3 rounded-[20px] mt-6 hover:border-[#2a2a2a] hover:bg-gray-50 transition-all duration-150">
+                <OpenGetStartedButton className="block w-full text-center border-[1.5px] border-[#e8e8e8] text-[#2a2a2a] text-[13.5px] font-semibold py-3 rounded-full mt-6 hover:border-[#2a2a2a] hover:bg-gray-50 transition-all duration-150">
                   Get started
                 </OpenGetStartedButton>
               </div>
@@ -130,7 +130,7 @@ export default function MarketingPricingPage() {
                 </div>
                 <a
                   href={SALES_MAILTO}
-                  className="block w-full text-center bg-green-700 text-white text-[13.5px] font-semibold py-3 rounded-[20px] mt-6 hover:bg-green-800 transition-all duration-150"
+                  className="block w-full text-center bg-green-700 text-white text-[13.5px] font-semibold py-3 rounded-full mt-6 hover:bg-green-800 transition-all duration-150"
                 >
                   Talk to sales
                 </a>

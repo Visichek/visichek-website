@@ -19,13 +19,13 @@ export function CTASection() {
             Let us show you a better way to secure every visitor entry and keep
             clean audit trails.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <OpenGetStartedButton className="bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] text-white font-semibold px-10 py-4 rounded-[20px] text-[15px] shadow-md shadow-green-700/20 hover:-translate-y-px hover:shadow-lg hover:shadow-green-600/30 active:scale-[0.98] transition-all duration-150 inline-block">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <OpenGetStartedButton className="inline-flex items-center justify-center rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-6 py-3 text-base font-medium text-white shadow-md shadow-green-700/20 transition-all duration-150 hover:-translate-y-px hover:shadow-lg hover:shadow-green-600/30 active:scale-[0.98]">
               Get started
             </OpenGetStartedButton>
             <a
               href={SALES_MAILTO}
-              className="border border-[#e8e8e8] text-[#2a2a2a] font-semibold px-10 py-4 rounded-[20px] text-[15px] hover:bg-gray-50 active:scale-[0.98] transition-all duration-100 inline-block"
+              className="inline-flex items-center justify-center rounded-full border border-[#e8e8e8] px-6 py-3 text-base font-medium text-[#2a2a2a] transition-all duration-100 hover:bg-gray-50 active:scale-[0.98]"
             >
               Talk to sales
             </a>

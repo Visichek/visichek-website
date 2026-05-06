@@ -114,7 +114,7 @@ export function BillingAutomationSection() {
               </li>
             ))}
           </ul>
-          <OpenGetStartedButton className="inline-flex items-center gap-1.5 bg-green-700 text-white text-[13.5px] font-semibold px-[22px] py-2.5 rounded-[20px] hover:bg-green-800 active:scale-[0.97] transition-all duration-150">
+          <OpenGetStartedButton className="inline-flex items-center gap-1.5 bg-green-700 text-white text-[13.5px] font-semibold px-[22px] py-2.5 rounded-full hover:bg-green-800 active:scale-[0.97] transition-all duration-150">
             Get started
           </OpenGetStartedButton>
         </RevealWrapper>

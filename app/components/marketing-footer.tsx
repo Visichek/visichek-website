@@ -6,6 +6,29 @@ import { X, Check } from "lucide-react";
 
 const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaqldaya";
+const TURNSTILE_SITE_KEY = "0x4AAAAAADKLd7-DRWNPJLBG";
+const TURNSTILE_SCRIPT_ID = "cf-turnstile-script";
+const TURNSTILE_SCRIPT_SRC =
+  "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        el: HTMLElement,
+        opts: {
+          sitekey: string;
+          callback?: (token: string) => void;
+          "expired-callback"?: () => void;
+          "error-callback"?: () => void;
+          theme?: "light" | "dark" | "auto";
+        },
+      ) => string;
+      reset: (id?: string) => void;
+      remove: (id?: string) => void;
+    };
+  }
+}
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -80,8 +103,11 @@ export default function MarketingFooter() {
   const [isVisible, setIsVisible] = useState(false);
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const modalCardRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetIdRef = useRef<string | null>(null);
 
   const openModal = useCallback(() => {
     setIsModalOpen(true);
@@ -101,6 +127,11 @@ export default function MarketingFooter() {
       setIsModalOpen(false);
       setSubmitState("idle");
       setErrorMsg("");
+      setTurnstileToken("");
+      if (turnstileWidgetIdRef.current && window.turnstile) {
+        window.turnstile.remove(turnstileWidgetIdRef.current);
+      }
+      turnstileWidgetIdRef.current = null;
     }, 350);
   }, []);
 
@@ -123,10 +154,52 @@ export default function MarketingFooter() {
     };
   }, [isModalOpen, closeModal]);
 
+  useEffect(() => {
+    if (document.getElementById(TURNSTILE_SCRIPT_ID)) return;
+    const script = document.createElement("script");
+    script.id = TURNSTILE_SCRIPT_ID;
+    script.src = TURNSTILE_SCRIPT_SRC;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!isModalOpen || submitState === "success") return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tryRender = () => {
+      if (cancelled) return;
+      const turnstile = window.turnstile;
+      const container = turnstileContainerRef.current;
+      if (!turnstile || !container) {
+        timer = setTimeout(tryRender, 120);
+        return;
+      }
+      if (turnstileWidgetIdRef.current) return;
+      turnstileWidgetIdRef.current = turnstile.render(container, {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: (token) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      });
+    };
+    tryRender();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [isModalOpen, submitState]);
+
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const form = e.currentTarget;
+      if (!turnstileToken) {
+        setErrorMsg("Please complete the security check before submitting.");
+        setSubmitState("error");
+        return;
+      }
       const formData = new FormData(form);
       setSubmitState("submitting");
       setErrorMsg("");
@@ -150,9 +223,14 @@ export default function MarketingFooter() {
       } catch {
         setErrorMsg("Network error. Please check your connection and retry.");
         setSubmitState("error");
+      } finally {
+        setTurnstileToken("");
+        if (turnstileWidgetIdRef.current && window.turnstile) {
+          window.turnstile.reset(turnstileWidgetIdRef.current);
+        }
       }
     },
-    [],
+    [turnstileToken],
   );
 
   return (
@@ -351,6 +429,7 @@ export default function MarketingFooter() {
               rounded-3xl bg-white
               shadow-2xl shadow-black/20
               ring-1 ring-black/[0.04]
+              overflow-hidden
               flex flex-col
               transition-all duration-350 ease-out
               ${
@@ -620,6 +699,27 @@ export default function MarketingFooter() {
                       </div>
                     </FormSection>
 
+                    <label className="flex items-start gap-2.5 cursor-pointer group rounded-xl border border-gray-200 bg-gray-50/60 px-4 py-3 hover:bg-gray-50 hover:border-gray-300 transition-colors">
+                      <input
+                        type="checkbox"
+                        name="marketing_opt_in"
+                        value="yes"
+                        className="mt-[3px] h-4 w-4 rounded border-gray-300 text-[#3A9615] focus:ring-2 focus:ring-[#3A9615]/30 cursor-pointer"
+                      />
+                      <span className="text-[13px] text-gray-700 leading-snug group-hover:text-gray-900">
+                        Keep me in the loop with VisiChek product updates,
+                        newsletters, and occasional marketing emails. You can
+                        unsubscribe anytime.
+                      </span>
+                    </label>
+
+                    <div className="flex flex-col gap-2">
+                      <span className="text-[13px] font-medium text-gray-700">
+                        Security check
+                      </span>
+                      <div ref={turnstileContainerRef} />
+                    </div>
+
                     {submitState === "error" && (
                       <p
                         className="text-[13px] text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"
@@ -649,7 +749,12 @@ export default function MarketingFooter() {
                     <button
                       type="submit"
                       form="get-started-form"
-                      disabled={submitState === "submitting"}
+                      disabled={submitState === "submitting" || !turnstileToken}
+                      title={
+                        !turnstileToken
+                          ? "Complete the security check to enable submission"
+                          : undefined
+                      }
                       className="flex-1 sm:flex-none inline-flex items-center justify-center rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-600/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-600/30 hover:-translate-y-px active:scale-[0.98] active:shadow-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                     >
                       {submitState === "submitting"

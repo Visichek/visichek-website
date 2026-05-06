@@ -1,10 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+const dpaTitle = "Data Processing Addendum";
+const dpaDescription =
+  "VisiChek's Data Processing Addendum (DPA) covering data handling obligations, security measures, sub-processors, and data subject rights.";
+
 export const metadata: Metadata = {
-  title: "Data Processing Addendum",
-  description:
-    "VisiChek's Data Processing Addendum (DPA) covering data handling obligations.",
+  title: dpaTitle,
+  description: dpaDescription,
+  alternates: { canonical: "/dpa" },
+  openGraph: {
+    title: `${dpaTitle} | VisiChek`,
+    description: dpaDescription,
+    url: "https://visichek.app/dpa",
+    siteName: "VisiChek",
+    type: "article",
+    locale: "en_US",
+    images: [
+      {
+        url: "/visichek-social-share.svg",
+        width: 1200,
+        height: 630,
+        alt: "VisiChek Data Processing Addendum",
+        type: "image/svg+xml",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@visichek",
+    creator: "@visichek",
+    title: `${dpaTitle} | VisiChek`,
+    description: dpaDescription,
+    images: ["/visichek-social-share.svg"],
+  },
 };
 
 export default function DPAPage() {

@@ -372,7 +372,7 @@
   padding: 0.7rem 0.9rem;
   font-size: 0.9rem;
   color: #1a1a1a;
-  background: #fafafa;
+  background-color: #fafafa;
   outline: none;
   transition: all 0.2s ease;
   -webkit-appearance: none;
@@ -386,13 +386,13 @@
 .sales-input:hover,
 .sales-select:hover {
   border-color: #d1d5db;
-  background: #fff;
+  background-color: #fff;
 }
 
 .sales-input:focus,
 .sales-select:focus {
   border-color: #3A9615;
-  background: #fff;
+  background-color: #fff;
   box-shadow: 0 0 0 3px rgba(58, 150, 21, 0.1);
 }
 

@@ -77,15 +77,22 @@ const rockSalt = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL("https://visichek.app"),
   title: {
-    default: "VisiChek",
+    default: "VisiChek — Workplace Security & Visitor Management System",
     template: "%s | VisiChek",
   },
   description:
-    "VisiChek helps teams verify, track, and manage every visitor across modern facilities and connected workplaces.",
+    "VisiChek helps teams verify, track, and manage every visitor across modern facilities and connected workplaces — from arrival to exit, without slowing down the front desk.",
+  applicationName: "VisiChek",
+  authors: [{ name: "VisiChek", url: "https://visichek.app" }],
+  creator: "VisiChek",
+  publisher: "VisiChek",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "VisiChek",
+    title: "VisiChek — Workplace Security & Visitor Management System",
     description:
-      "Visitor management for modern facilities, departments, and security teams.",
+      "Verify, track, and manage every visitor across modern facilities, departments, and security teams.",
     url: "https://visichek.app/",
     siteName: "VisiChek",
     images: [
@@ -102,7 +109,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "VisiChek",
+    site: "@visichek",
+    creator: "@visichek",
+    title: "VisiChek — Workplace Security & Visitor Management System",
     description:
       "Visitor management for modern facilities, compliance, and workplace operations.",
     images: ["/visichek-social-share.svg"],
@@ -121,10 +130,8 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: "/visichek-favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon.ico" },
     ],
     shortcut: "/favicon-32x32.png",
     apple: "/apple-touch-icon.png",
@@ -143,6 +150,78 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://visichek.app/#organization",
+      name: "VisiChek",
+      url: "https://visichek.app/",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://visichek.app/visichek-logomark.svg",
+        width: 512,
+        height: 512,
+      },
+      image: "https://visichek.app/visichek-social-share.svg",
+      description:
+        "VisiChek helps teams verify, track, and manage every visitor across modern facilities and connected workplaces.",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Lagos",
+        addressCountry: "NG",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "support@visichek.com",
+        availableLanguage: ["English"],
+      },
+      sameAs: [],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://visichek.app/#website",
+      url: "https://visichek.app/",
+      name: "VisiChek",
+      description:
+        "Visitor management for modern facilities, departments, and security teams.",
+      publisher: { "@id": "https://visichek.app/#organization" },
+      inLanguage: "en-US",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://visichek.app/#software",
+      name: "VisiChek",
+      applicationCategory: "BusinessApplication",
+      applicationSubCategory: "Visitor Management System",
+      operatingSystem: "Web, iOS, Android",
+      url: "https://visichek.app/",
+      image: "https://visichek.app/visichek-social-share.svg",
+      description:
+        "VisiChek is a visitor management platform that helps facilities verify, track, and manage every visitor from arrival to exit — with badge printing, ID scanning, and NDPR-compliant audit logs.",
+      publisher: { "@id": "https://visichek.app/#organization" },
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "USD",
+        price: "0",
+        availability: "https://schema.org/InStock",
+        url: "https://visichek.app/pricing",
+      },
+      featureList: [
+        "Visitor check-in & check-out",
+        "ID scanning and verification",
+        "Badge printing",
+        "Pre-registration & invites",
+        "Host notifications",
+        "Audit logs and reporting",
+        "NDPR-compliant data handling",
+      ],
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -157,6 +236,12 @@ export default function RootLayout({
         scrollbarColor: "#374151 #000000",
       }}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body className="relative bg-[#1A1A1A]">
         <SmoothScroll />
         <ProgressBarProvider>
