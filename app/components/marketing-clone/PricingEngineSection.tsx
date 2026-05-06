@@ -1,23 +1,23 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import Image from "next/image";
 import OpenGetStartedButton from "../open-sales-button";
 import { RevealWrapper } from "./BillingAutomationSection";
-
-const Lanyard = dynamic(() => import("@/components/ui/lanyard"), { ssr: false });
 
 export function PricingEngineSection() {
   return (
     <div className="feature-block bg-white">
       <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-16 items-center">
-        {/* Lanyard — left on desktop */}
+        {/* ID card — left on desktop */}
         <RevealWrapper className="order-2 md:order-1 hidden md:block">
-          <div className="relative h-[480px] md:h-[520px] w-full rounded-3xl border border-green-100 bg-green-50 overflow-hidden">
-            <Lanyard
-              position={[0, 0, 30]}
-              gravity={[0, -40, 0]}
-              fov={20}
-              transparent={true}
+          <div className="relative h-[480px] md:h-[520px] w-full rounded-3xl border border-green-100 bg-green-50 overflow-hidden flex items-center justify-center">
+            <Image
+              src="/id-card.svg"
+              alt="Visitor ID card"
+              width={358}
+              height={490}
+              className="max-h-full w-auto object-contain"
+              priority={false}
             />
           </div>
         </RevealWrapper>

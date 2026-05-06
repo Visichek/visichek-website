@@ -11,16 +11,29 @@ export function AnimatedPage({ children }: { children: ReactNode }) {
     <AnimatePresence mode="wait" initial={false}>
       <motion.main
         key={pathname}
-        initial={{ opacity: 0.2, filter: "blur(4px)", scale: 0.98 }}
-        animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-        exit={{ opacity: 0.2, filter: "blur(4px)", scale: 1.01 }}
-        transition={{
-          duration: 0.3,
-          ease: [0.25, 0.46, 0.45, 0.94],
+        initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          transition: {
+            duration: 0.65,
+            ease: [0.22, 1, 0.36, 1],
+          },
+        }}
+        exit={{
+          opacity: 0,
+          y: -8,
+          filter: "blur(6px)",
+          transition: {
+            duration: 0.28,
+            ease: [0.4, 0, 0.6, 1],
+          },
         }}
         style={{
           width: "100%",
           minHeight: "100vh",
+          willChange: "opacity, transform, filter",
         }}
       >
         {children}
