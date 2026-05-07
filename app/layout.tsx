@@ -77,11 +77,11 @@ const rockSalt = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL("https://visichek.app"),
   title: {
-    default: "VisiChek — Workplace Security & Visitor Management System",
+    default: "VisiChek: Secure Digital Visitor Management System",
     template: "%s | VisiChek",
   },
   description:
-    "VisiChek helps teams verify, track, and manage every visitor across modern facilities and connected workplaces — from arrival to exit, without slowing down the front desk.",
+    "Replace your paper logbooks with fast, secure visitor check-in. ID verification, badge printing, and real-time records for your facility.",
   applicationName: "VisiChek",
   authors: [{ name: "VisiChek", url: "https://visichek.app" }],
   creator: "VisiChek",
@@ -90,9 +90,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "VisiChek — Workplace Security & Visitor Management System",
+    title: "VisiChek: Secure Digital Visitor Management System",
     description:
-      "Verify, track, and manage every visitor across modern facilities, departments, and security teams.",
+      "Replace your paper logbooks with fast, secure visitor check-in. ID verification, badge printing, and real-time records for your facility.",
     url: "https://visichek.app/",
     siteName: "VisiChek",
     images: [
@@ -111,9 +111,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@visichek",
     creator: "@visichek",
-    title: "VisiChek — Workplace Security & Visitor Management System",
+    title: "VisiChek: Secure Digital Visitor Management System",
     description:
-      "Visitor management for modern facilities, compliance, and workplace operations.",
+      "Replace your paper logbooks with fast, secure visitor check-in. ID verification, badge printing, and real-time records for your facility.",
     images: ["/visichek-social-share.svg"],
   },
   keywords: [
