@@ -7,7 +7,7 @@ import { X, Check } from "lucide-react";
 const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
 const ONBOARDING_ENDPOINT =
   process.env.NEXT_PUBLIC_ONBOARDING_ENDPOINT ??
-  "https://api.visichek.com/v1/onboarding/submissions";
+  "https://api.visichek.app/v1/onboarding/submissions";
 const FORM_VERSION = "2026-05-01";
 const TURNSTILE_SITE_KEY = "0x4AAAAAADKLd7-DRWNPJLBG";
 const TURNSTILE_SCRIPT_ID = "cf-turnstile-script";
@@ -226,6 +226,7 @@ export default function MarketingFooter() {
       const formData = new FormData(form);
       const payload: Record<string, string | string[]> = {};
       for (const key of new Set(formData.keys())) {
+        if (key === "cf-turnstile-response") continue;
         const values = formData.getAll(key).map(String);
         payload[key] = values.length > 1 ? values : values[0];
       }
