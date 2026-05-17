@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MarketingHomePage from "./components/marketing-home-page";
+import { fetchFaqs } from "./util/faqs";
 
 const homeTitle =
   "VisiChek | Workplace security starts with a Visitor Management System";
@@ -37,6 +38,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
-  return <MarketingHomePage />;
+// ISR — refetch the FAQ payload every 5 minutes so admin edits land
+// on the public site within that window without a redeploy.
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const faqs = await fetchFaqs();
+  return <MarketingHomePage faqs={faqs} />;
 }

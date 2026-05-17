@@ -243,7 +243,11 @@ export default function MarketingHeader() {
 
   function isLinkActive(href: string) {
     const [path, hash] = href.split("#");
-    const linkPath = path || "/";
+    // An empty `path` means the link points at the current page (e.g.
+    // `#pricing` rendered while we're on `/pricing`). Treat it as
+    // matching the current pathname rather than falling back to `/`,
+    // which would mark the link inactive on every non-home page.
+    const linkPath = path === "" ? pathname : path || "/";
     const onLinkPath =
       linkPath === "/"
         ? pathname === "/"

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import MarketingPricingPage from "../components/marketing-pricing-page";
+import { fetchPricingMarketing } from "../util/pricing-marketing";
+import { fetchFaqs } from "../util/faqs";
 
 const pricingTitle = "VisiChek Pricing & Resources";
 const pricingDescription =
@@ -36,6 +38,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PricingPage() {
-  return <MarketingPricingPage />;
+// ISR — refetch the pricing-marketing payload every 5 minutes so
+// admin edits to plans, copy, or comparison rows land on the public
+// site within that window without a redeploy.
+export const revalidate = 300;
+
+export default async function PricingPage() {
+  const [payload, faqs] = await Promise.all([
+    fetchPricingMarketing(),
+    fetchFaqs(),
+  ]);
+  return <MarketingPricingPage payload={payload} faqs={faqs} />;
 }

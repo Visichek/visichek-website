@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState, useRef, useCallback, FormEvent } from "react";
 import { X, Check } from "lucide-react";
+import { ONBOARDING_ENDPOINTS } from "../util/api";
 
 const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
 const ONBOARDING_ENDPOINT =
-  process.env.NEXT_PUBLIC_ONBOARDING_ENDPOINT ??
-  "https://api.visichek.app/v1/onboarding/submissions";
+  process.env.NEXT_PUBLIC_ONBOARDING_ENDPOINT ?? ONBOARDING_ENDPOINTS.submissions();
 const FORM_VERSION = "2026-05-01";
 const TURNSTILE_SITE_KEY = "0x4AAAAAADKLd7-DRWNPJLBG";
 const TURNSTILE_SCRIPT_ID = "cf-turnstile-script";

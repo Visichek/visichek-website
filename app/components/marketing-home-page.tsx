@@ -7,8 +7,13 @@ import { EnterpriseFeaturesSection } from "./marketing-clone/EnterpriseFeaturesS
 import { HeroSection } from "./marketing-clone/HeroSection";
 import { InvoicingSection } from "./marketing-clone/InvoicingSection";
 import { PricingEngineSection } from "./marketing-clone/PricingEngineSection";
+import { DEFAULT_FAQ_PAYLOAD, type FaqPayload } from "../util/faqs";
 
-export default function MarketingHomePage() {
+export default function MarketingHomePage({
+  faqs,
+}: {
+  faqs?: FaqPayload | null;
+} = {}) {
   return (
     <main>
       <HeroSection />
@@ -19,8 +24,8 @@ export default function MarketingHomePage() {
         <InvoicingSection />
       </div>
       <ComplianceSection />
-      <AutomationsSection />
-     
+      <AutomationsSection payload={faqs ?? DEFAULT_FAQ_PAYLOAD} />
+
       <CTASection />
     </main>
   );

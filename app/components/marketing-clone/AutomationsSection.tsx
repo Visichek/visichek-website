@@ -2,38 +2,16 @@
 
 import { useRef, useCallback } from "react";
 import { RevealWrapper } from "./BillingAutomationSection";
+import { DEFAULT_FAQ_PAYLOAD, type FaqPayload } from "../../util/faqs";
+import { renderSafeHtml } from "../../util/safe-html";
 
-const faqs = [
-  {
-    question: "Do we need special hardware to use VisiChek?",
-    answer:
-      "No. VisiChek works with standard reception laptops, tablets, webcams, and badge printers. If your building already uses QR scanners, access control doors, or turnstiles, VisiChek can integrate with them as part of an upgraded setup.",
-  },
-  {
-    question: "Can VisiChek verify Nigerian government-issued IDs?",
-    answer:
-      "Yes. VisiChek is designed to support government-issued identification commonly used in Nigeria and extracts visitor information automatically during check-in.",
-  },
-  {
-    question:
-      "Where is our visitor data stored, and is it NDPA compliant?",
-    answer:
-      "VisiChek supports encrypted visitor records, role-based access control, and configurable data retention policies. For organizations with compliance requirements, deployment options can support local hosting or approved infrastructure aligned with NDPA expectations.",
-  },
-  {
-    question:
-      "Can multiple departments or branches use the same system?",
-    answer:
-      "Yes. Each department manages its own visitors independently, while administrators maintain company-wide visibility. VisiChek also supports multi-branch setups from a single centralized dashboard.",
-  },
-  {
-    question: "How is VisiChek priced?",
-    answer:
-      "VisiChek uses a subscription model based on your organization\u2019s setup, including number of departments, locations, and check-in workflow requirements such as QR or hardware integrations. Most organizations start with a reception-level deployment and expand as needed.",
-  },
-];
-
-function FAQItem({ question, answer }: { question: string; answer: string }) {
+function FAQItem({
+  question,
+  answer,
+}: {
+  question: string;
+  answer: string;
+}) {
   const ansRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -46,7 +24,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
     // Close all others first
     const allBtns = btn
-      .closest("#faq-list")
+      .closest(".faq-list")
       ?.querySelectorAll<HTMLButtonElement>("button");
     allBtns?.forEach((b) => {
       b.setAttribute("aria-expanded", "false");
@@ -77,30 +55,69 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         </svg>
       </button>
       <div ref={ansRef} className="faq-ans">
-        <div className="text-sm text-[#6a6a6a] leading-[1.75] pt-4">
-          {answer}
+        <div className="text-sm text-[#6a6a6a] leading-[1.75] pt-4 faq-answer-body">
+          {renderSafeHtml(answer)}
         </div>
       </div>
     </div>
   );
 }
 
-export function AutomationsSection() {
+export function AutomationsSection({
+  payload,
+}: {
+  payload?: FaqPayload | null;
+} = {}) {
+  const data = payload ?? DEFAULT_FAQ_PAYLOAD;
+
   return (
     <section className="py-24 bg-white border-t border-[#e8e8e8]">
       <div className="max-w-2xl mx-auto px-6">
         <RevealWrapper>
-          <h2 className="font-serif text-[38px] md:text-[48px] text-[#2a2a2a] tracking-[-0.02em] text-center mb-14">
-            Frequently asked questions
+          <h2 className="font-serif text-[38px] md:text-[48px] text-[#2a2a2a] tracking-[-0.02em] text-center mb-4">
+            {data.headline}
           </h2>
         </RevealWrapper>
-        <div id="faq-list" className="divide-y divide-[#e8e8e8]">
-          {faqs.map((faq) => (
-            <RevealWrapper key={faq.question}>
-              <FAQItem question={faq.question} answer={faq.answer} />
-            </RevealWrapper>
-          ))}
-        </div>
+        {data.subheadline ? (
+          <RevealWrapper>
+            <p className="text-center text-[15px] text-[#6a6a6a] leading-[1.75] mb-10">
+              {data.subheadline}
+            </p>
+          </RevealWrapper>
+        ) : (
+          <div className="mb-10" />
+        )}
+
+        {data.sections.map((section) => (
+          <div
+            key={section.categoryKey}
+            id={`section-${section.categoryKey}`}
+            className="mb-10 last:mb-0"
+          >
+            {data.sections.length > 1 ? (
+              <RevealWrapper>
+                <h3 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#6a6a6a] mb-2">
+                  {section.label}
+                </h3>
+              </RevealWrapper>
+            ) : null}
+            <div className="faq-list divide-y divide-[#e8e8e8]">
+              {section.items.map((item) => (
+                <RevealWrapper key={item.itemKey}>
+                  <FAQItem question={item.question} answer={item.answer} />
+                </RevealWrapper>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {data.footerHtml ? (
+          <RevealWrapper>
+            <div className="mt-12 text-center text-sm text-[#6a6a6a] leading-[1.75] faq-footer-body">
+              {renderSafeHtml(data.footerHtml)}
+            </div>
+          </RevealWrapper>
+        ) : null}
       </div>
     </section>
   );
