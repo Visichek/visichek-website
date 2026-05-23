@@ -11,8 +11,10 @@ interface ChromeRouterProps {
   marketingFooter: ReactNode;
 }
 
-const MARKETING_ROUTES = new Set(["/", "/pricing", "/blog", "/privacy", "/terms", "/dpa"]);
-const MARKETING_PREFIXES = ["/blog", "/blogs", "/articles"];
+// The dark "content" chrome is reserved for the video library; every other
+// route — including unmatched paths that resolve to the 404 page — uses the
+// light marketing chrome so the brand stays consistent.
+const CONTENT_PREFIXES = ["/videos"];
 
 export default function ChromeRouter({
   children,
@@ -22,13 +24,11 @@ export default function ChromeRouter({
   marketingFooter,
 }: ChromeRouterProps) {
   const pathname = usePathname();
-  const isMarketingRoute =
-    MARKETING_ROUTES.has(pathname) ||
-    MARKETING_PREFIXES.some(
-      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-    );
+  const isContentRoute = CONTENT_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
 
-  if (isMarketingRoute) {
+  if (!isContentRoute) {
     return (
       <div className="marketing-shell min-h-screen bg-white text-[#2a2a2a] antialiased overflow-x-clip">
         {marketingHeader}
