@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { BASE_URL } from "./util/api";
 import type { Blog } from "./types/blog";
+import { fetchLegalDocuments } from "./util/legal";
 
 const SITE_URL = "https://visichek.app";
 
@@ -18,9 +19,7 @@ const staticRoutes: StaticRoute[] = [
   { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
   { path: "/blog", changeFrequency: "daily", priority: 0.8 },
   { path: "/videos", changeFrequency: "weekly", priority: 0.6 },
-  { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
-  { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
-  { path: "/dpa", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/legal", changeFrequency: "monthly", priority: 0.4 },
 ];
 
 /**
@@ -68,6 +67,25 @@ async function getBlogEntries(): Promise<MetadataRoute.Sitemap> {
   }
 }
 
+async function getLegalEntries(): Promise<MetadataRoute.Sitemap> {
+  const result = await fetchLegalDocuments({
+    limit: 100,
+    sort: "title",
+  });
+
+  if (!result?.items.length) return [];
+
+  return result.items.map((document) => ({
+    url: `${SITE_URL}/legal/${document.slug}`,
+    lastModified: new Date(
+      (document.publishedAt ?? document.effectiveAt ?? Date.now() / 1000) *
+        1000,
+    ),
+    changeFrequency: "yearly",
+    priority: 0.3,
+  }));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
@@ -78,7 +96,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }));
 
-  const blogEntries = await getBlogEntries();
+  const [blogEntries, legalEntries] = await Promise.all([
+    getBlogEntries(),
+    getLegalEntries(),
+  ]);
 
-  return [...staticEntries, ...blogEntries];
+  return [...staticEntries, ...blogEntries, ...legalEntries];
 }

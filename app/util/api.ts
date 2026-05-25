@@ -47,6 +47,15 @@ export const FAQ_ENDPOINTS = {
   list: () => `${API_V1}/faqs`,
 };
 
+/**
+ * Public legal documents endpoint. These are VisiChek-owned website legal
+ * documents, not tenant-scoped visitor privacy notices.
+ */
+export const LEGAL_ENDPOINTS = {
+  list: () => `${API_LEGACY_V1}/legal`,
+  detail: (slug: string) => `${API_LEGACY_V1}/legal/${encodeURIComponent(slug)}`,
+};
+
 export const ONBOARDING_ENDPOINTS = {
   submissions: () => `${API_V1}/onboarding/submissions`,
 };

@@ -423,6 +423,14 @@ export default function MarketingFooter() {
               <ul className="space-y-3 text-[13px] text-charcoal-lighter">
                 <li>
                   <Link
+                    href="/legal"
+                    className="hover:text-charcoal transition-colors"
+                  >
+                    Legal documents
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/privacy"
                     className="hover:text-charcoal transition-colors"
                   >
@@ -442,7 +450,7 @@ export default function MarketingFooter() {
                     href="/dpa"
                     className="hover:text-charcoal transition-colors"
                   >
-                    Data Processing Addendum
+                    Data Processing Agreement
                   </Link>
                 </li>
               </ul>
