@@ -1,8 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useRef, useCallback, FormEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  FormEvent,
+} from "react";
 import { X, Check } from "lucide-react";
+import PhoneInput, {
+  isValidPhoneNumber,
+  getCountries,
+  type Country,
+} from "react-phone-number-input";
+import enCountryLabels from "react-phone-number-input/locale/en.json";
+import Select, { type SingleValue } from "react-select";
+import "react-phone-number-input/style.css";
 import { ONBOARDING_ENDPOINTS } from "../util/api";
 
 const SALES_MAILTO = "mailto:sales@visichek.com?subject=Talk%20to%20sales";
@@ -116,9 +130,73 @@ const FIELD_LABELS: Record<string, string> = {
   access_control: "Existing access control",
   timeline: "Deployment timeline",
   marketing_opt_in: "Marketing opt-in",
+  agreed_to_policies: "Agreed to policies & legal documents",
 };
 
 const FIELD_ORDER: string[] = Object.keys(FIELD_LABELS);
+
+// Basic, deliberately conservative email shape check. The browser's
+// native `type="email"` validity is the first gate; this is a second
+// guard so we never POST an obviously malformed address.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+type CountryOption = { value: string; label: string };
+
+// Build the searchable country list from the ISO labels that ship with
+// react-phone-number-input, so we don't pull in a second data package.
+const COUNTRY_OPTIONS: CountryOption[] = getCountries()
+  .map((code) => ({
+    value: code,
+    label: (enCountryLabels as Record<string, string>)[code] ?? code,
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+// react-select styled to match the form's `.sales-input` look.
+const countrySelectStyles = {
+  control: (
+    base: Record<string, unknown>,
+    state: { isFocused: boolean },
+  ) => ({
+    ...base,
+    minHeight: "auto",
+    borderWidth: "1.5px",
+    borderColor: state.isFocused ? "#3A9615" : "#e5e7eb",
+    borderRadius: "12px",
+    padding: "0.15rem 0.15rem",
+    backgroundColor: state.isFocused ? "#fff" : "#fafafa",
+    boxShadow: state.isFocused ? "0 0 0 3px rgba(58, 150, 21, 0.1)" : "none",
+    fontSize: "0.9rem",
+    "&:hover": { borderColor: state.isFocused ? "#3A9615" : "#d1d5db" },
+  }),
+  valueContainer: (base: Record<string, unknown>) => ({
+    ...base,
+    padding: "0.4rem 0.6rem",
+  }),
+  placeholder: (base: Record<string, unknown>) => ({
+    ...base,
+    color: "#9ca3af",
+  }),
+  menu: (base: Record<string, unknown>) => ({
+    ...base,
+    borderRadius: "12px",
+    overflow: "hidden",
+    zIndex: 50,
+  }),
+  option: (
+    base: Record<string, unknown>,
+    state: { isSelected: boolean; isFocused: boolean },
+  ) => ({
+    ...base,
+    fontSize: "0.875rem",
+    backgroundColor: state.isSelected
+      ? "#3A9615"
+      : state.isFocused
+        ? "#ecfdf3"
+        : "#fff",
+    color: state.isSelected ? "#fff" : "#1a1a1a",
+    cursor: "pointer",
+  }),
+};
 
 export default function MarketingFooter() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -126,6 +204,9 @@ export default function MarketingFooter() {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [phone, setPhone] = useState<string | undefined>(undefined);
+  const [country, setCountry] = useState<CountryOption | null>(null);
+  const [agreedToPolicies, setAgreedToPolicies] = useState(false);
   const modalCardRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
@@ -150,6 +231,9 @@ export default function MarketingFooter() {
       setSubmitState("idle");
       setErrorMsg("");
       setTurnstileToken("");
+      setPhone(undefined);
+      setCountry(null);
+      setAgreedToPolicies(false);
       if (turnstileWidgetIdRef.current && window.turnstile) {
         window.turnstile.remove(turnstileWidgetIdRef.current);
       }
@@ -217,6 +301,35 @@ export default function MarketingFooter() {
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const form = e.currentTarget;
+
+      // ── Field-level validation for the controlled / formatted inputs ──
+      const emailValue = String(
+        new FormData(form).get("work_email") ?? "",
+      ).trim();
+      if (!EMAIL_RE.test(emailValue)) {
+        setErrorMsg("Please enter a valid work email address.");
+        setSubmitState("error");
+        return;
+      }
+      if (!phone || !isValidPhoneNumber(phone)) {
+        setErrorMsg(
+          "Please enter a valid phone number, including the country code.",
+        );
+        setSubmitState("error");
+        return;
+      }
+      if (!country) {
+        setErrorMsg("Please select your country.");
+        setSubmitState("error");
+        return;
+      }
+      if (!agreedToPolicies) {
+        setErrorMsg(
+          "Please agree to VisiChek's policies and legal documents to continue.",
+        );
+        setSubmitState("error");
+        return;
+      }
       if (!turnstileToken) {
         setErrorMsg("Please complete the security check before submitting.");
         setSubmitState("error");
@@ -230,6 +343,13 @@ export default function MarketingFooter() {
         const values = formData.getAll(key).map(String);
         payload[key] = values.length > 1 ? values : values[0];
       }
+
+      // Controlled inputs (phone, country) and the consent flag aren't part
+      // of the native FormData, so set them explicitly.
+      payload.phone_number = phone;
+      payload.country = country.label;
+      payload.country_code = country.value;
+      payload.agreed_to_policies = "yes";
 
       setSubmitState("submitting");
       setErrorMsg("");
@@ -252,6 +372,9 @@ export default function MarketingFooter() {
         if (res.ok) {
           setSubmitState("success");
           form.reset();
+          setPhone(undefined);
+          setCountry(null);
+          setAgreedToPolicies(false);
         } else {
           const data = await res.json().catch(() => ({}));
           const detailError = data?.details?.error;
@@ -284,7 +407,7 @@ export default function MarketingFooter() {
         }
       }
     },
-    [turnstileToken],
+    [turnstileToken, phone, country, agreedToPolicies],
   );
 
   return (
@@ -581,12 +704,16 @@ export default function MarketingFooter() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField label="Phone number" required>
-                          <input
-                            type="tel"
-                            name="phone_number"
-                            placeholder="+234 800 000 0000"
-                            required
-                            className="sales-input"
+                          <PhoneInput
+                            international
+                            countryCallingCodeEditable={false}
+                            defaultCountry="NG"
+                            countries={getCountries() as Country[]}
+                            value={phone}
+                            onChange={setPhone}
+                            placeholder="800 000 0000"
+                            className="sales-phone-input"
+                            numberInputProps={{ className: "sales-input" }}
                           />
                         </FormField>
                         <FormField label="Your role" required>
@@ -623,12 +750,19 @@ export default function MarketingFooter() {
                           />
                         </FormField>
                         <FormField label="Country" required>
-                          <input
-                            type="text"
-                            name="country"
-                            placeholder="Nigeria"
-                            required
-                            className="sales-input"
+                          <Select<CountryOption>
+                            instanceId="onboarding-country"
+                            inputId="onboarding-country-input"
+                            options={COUNTRY_OPTIONS}
+                            value={country}
+                            onChange={(opt: SingleValue<CountryOption>) =>
+                              setCountry(opt)
+                            }
+                            placeholder="Search and select a country"
+                            isSearchable
+                            styles={countrySelectStyles}
+                            classNamePrefix="sales-country"
+                            menuPlacement="auto"
                           />
                         </FormField>
                       </div>
@@ -775,6 +909,29 @@ export default function MarketingFooter() {
                       </span>
                     </label>
 
+                    <label className="flex items-start gap-2.5 cursor-pointer group rounded-xl border border-gray-200 bg-gray-50/60 px-4 py-3 hover:bg-gray-50 hover:border-gray-300 transition-colors">
+                      <input
+                        type="checkbox"
+                        name="agreed_to_policies"
+                        checked={agreedToPolicies}
+                        onChange={(e) => setAgreedToPolicies(e.target.checked)}
+                        className="mt-[3px] h-4 w-4 rounded border-gray-300 text-[#3A9615] focus:ring-2 focus:ring-[#3A9615]/30 cursor-pointer"
+                      />
+                      <span className="text-[13px] text-gray-700 leading-snug group-hover:text-gray-900">
+                        I have read and agree to VisiChek&apos;s{" "}
+                        <Link
+                          href="/legal"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-[#3A9615] underline underline-offset-2 hover:text-[#2e7a11]"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          policies and legal documents
+                        </Link>
+                        .<span className="text-[#3A9615] ml-0.5">*</span>
+                      </span>
+                    </label>
+
                     <div className="flex flex-col gap-2">
                       <span className="text-[13px] font-medium text-gray-700">
                         Security check
@@ -811,11 +968,17 @@ export default function MarketingFooter() {
                     <button
                       type="submit"
                       form="get-started-form"
-                      disabled={submitState === "submitting" || !turnstileToken}
+                      disabled={
+                        submitState === "submitting" ||
+                        !turnstileToken ||
+                        !agreedToPolicies
+                      }
                       title={
-                        !turnstileToken
-                          ? "Complete the security check to enable submission"
-                          : undefined
+                        !agreedToPolicies
+                          ? "Agree to the policies and legal documents to enable submission"
+                          : !turnstileToken
+                            ? "Complete the security check to enable submission"
+                            : undefined
                       }
                       className="flex-1 sm:flex-none inline-flex items-center justify-center rounded-full bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-green-600/20 transition-all duration-200 hover:shadow-lg hover:shadow-green-600/30 hover:-translate-y-px active:scale-[0.98] active:shadow-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                     >
