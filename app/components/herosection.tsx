@@ -1,7 +1,6 @@
 import { Blog } from "../types/blog";
 import { BASE_URL } from "../util/api";
-import ArticleLinkCard from "./articlelinkcard";
-import FeaturedStoryGrid from "./featuredstorygrid";
+import HeroSectionView from "./herosection-view";
 
 const HeroSection = async () => {
   let blogs: Blog[] = [];
@@ -31,25 +30,7 @@ const HeroSection = async () => {
     return null;
   }
 
-  const mainArticle = blogs[0];
-  const featuredArticles = blogs.slice(1, 4);
-
-  return (
-    <section>
-      <ArticleLinkCard
-        imageSrc={mainArticle.featureImage.url}
-        href={`/blogs/${mainArticle.id}`}
-        title={mainArticle.title}
-        author={mainArticle.author.name}
-        authorAvatar={mainArticle.author.avatarUrl}
-        excerpt={mainArticle.excerpt}
-        categoryName={mainArticle.category?.name}
-        categorySlug={mainArticle.category?.slug}
-        dateCreated={mainArticle.dateCreated}
-      />
-      <FeaturedStoryGrid blogs={featuredArticles} />
-    </section>
-  );
+  return <HeroSectionView blogs={blogs} />;
 };
 
 export default HeroSection;

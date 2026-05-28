@@ -257,7 +257,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="relative bg-[#1A1A1A]">
+      <body className="relative bg-[#1A1A1A]" suppressHydrationWarning>
         <SmoothScroll />
         <ProgressBarProvider>
           <ChromeRouter

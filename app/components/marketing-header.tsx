@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import MarketingBlogDropdown from "./marketing-blog-dropdown";
+import { useHeaderTheme } from "@/app/util/header-theme";
 
 const GlassSurface = dynamic(() => import("@/components/GlassSurface"), {
   ssr: false,
@@ -154,6 +155,8 @@ export default function MarketingHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const rafRef = useRef<number | null>(null);
+  // Surface preference (glass vs plain white), persisted in a cookie.
+  const { isGlass } = useHeaderTheme();
   const isHome = pathname === "/";
   const isPricing = pathname === "/pricing";
 
@@ -320,17 +323,19 @@ export default function MarketingHeader() {
             </GlassSurface>}
           </div>
 
-          {/* Layer 1 — White cover (fades on scroll, desktop only). Mobile gets a
-              solid white bar rendered below for speed + clarity. */}
+          {/* Layer 1 — White cover (desktop only). Hidden when the visitor
+              prefers the glass surface; shown for the plain-white preference.
+              Mobile gets a solid white bar rendered below for speed + clarity. */}
           <div
             className="absolute inset-0 pointer-events-none hidden lg:block"
             style={{
               borderRadius: "inherit",
               background: "#ffffff",
-              borderBottom: isScrolled
-                ? "none"
-                : "1px solid rgba(0,0,0,0.06)",
-              opacity: isScrolled ? 0 : 1,
+              borderBottom:
+                isGlass && isScrolled
+                  ? "none"
+                  : "1px solid rgba(0,0,0,0.06)",
+              opacity: isGlass ? 0 : 1,
               transition: "opacity 0.4s ease, border-bottom 0.4s ease",
             }}
           />
@@ -387,7 +392,7 @@ export default function MarketingHeader() {
                     key={l.label}
                     href={l.href}
                     isActive={isLinkActive(l.href)}
-                    isGlass={isScrolled}
+                    isGlass={isGlass}
                   >
                     {l.label}
                   </NavLink>
@@ -410,7 +415,7 @@ export default function MarketingHeader() {
                     style={{
                       fontSize: "13.5px",
                       fontWeight: 500,
-                      color: isScrolled ? "#1f2937" : "#4b5563",
+                      color: isGlass ? "#1f2937" : "#4b5563",
                       transitionTimingFunction: EASE,
                     }}
                   >
@@ -424,7 +429,7 @@ export default function MarketingHeader() {
                     pathname.startsWith("/blogs") ||
                     pathname.startsWith("/articles")
                   }
-                  isGlass={isScrolled}
+                  isGlass={isGlass}
                 />
               </div>
             </nav>
@@ -435,13 +440,11 @@ export default function MarketingHeader() {
                 href={SALES_MAILTO}
                 className="hidden rounded-full px-4 py-[7px] text-[13px] font-medium transition-all duration-200 hover:shadow-sm md:inline-flex"
                 style={{
-                  border: isScrolled
-                    ? "1px solid rgba(0,0,0,0.08)"
-                    : "1px solid rgba(0,0,0,0.08)",
-                  background: isScrolled
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  background: isGlass
                     ? "rgba(255,255,255,0.6)"
                     : "rgba(0,0,0,0.03)",
-                  color: isScrolled ? "#1f2937" : "#374151",
+                  color: isGlass ? "#1f2937" : "#374151",
                   transition: `all 0.4s ${EASE}`,
                 }}
               >
@@ -458,13 +461,11 @@ export default function MarketingHeader() {
                 onClick={() => setMobileOpen((v) => !v)}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 lg:hidden"
                 style={{
-                  border: isScrolled
-                    ? "1px solid rgba(0,0,0,0.08)"
-                    : "1px solid rgba(0,0,0,0.08)",
-                  background: isScrolled
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  background: isGlass
                     ? "rgba(255,255,255,0.6)"
                     : "rgba(0,0,0,0.03)",
-                  color: isScrolled ? "#1f2937" : "#374151",
+                  color: isGlass ? "#1f2937" : "#374151",
                   transition: `all 0.4s ${EASE}`,
                 }}
                 aria-label={mobileOpen ? "Close menu" : "Open menu"}

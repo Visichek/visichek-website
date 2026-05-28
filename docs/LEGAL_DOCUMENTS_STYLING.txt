@@ -1,0 +1,488 @@
+================================================================================
+LEGAL DOCUMENTS — HOW STYLING & RENDERING WORKS
+================================================================================
+Scope: Everything about how a legal document is fetched, structured, rendered,
+       and styled on the VisiChek marketing website.
+Last reviewed: 2026-05-28
+
+This document describes the full pipeline, from the API request to the final
+Tailwind classes painted on screen, with exact values so the look can be
+reproduced or modified confidently.
+
+
+--------------------------------------------------------------------------------
+0. THE BIG PICTURE (READ THIS FIRST)
+--------------------------------------------------------------------------------
+Legal documents are NOT hard-coded HTML. They are stored in a backend CMS as a
+tree of "blocks" (the same block model BlockNote editors produce), fetched at
+request time over HTTP, and converted to styled React elements by a single
+recursive renderer.
+
+The flow for any legal page:
+
+   URL  ──►  Route file  ──►  fetchLegalDocument()  ──►  LegalDocumentPage shell
+                                      │                          │
+                                      │ returns JSON             │ renders header
+                                      ▼                          ▼
+                              LegalBlock[]  ──────►  LegalBlockRenderer (the body)
+                                                            │
+                                                            ▼
+                                                  styled <h2>/<p>/<ul>/...
+
+So "how each legal document gets rendered" = "how the block array is walked and
+turned into styled elements." That walking + styling lives almost entirely in
+ONE file:
+
+   app/legal/legal-block-renderer.tsx   <-- the heart of body styling
+
+The surrounding page frame (hero, title, meta pills, download button, back
+links) lives in:
+
+   app/legal/legal-page-shell.tsx       <-- the page chrome around the body
+
+The list/index page (the cards grid) lives in:
+
+   app/legal/page.tsx                   <-- the /legal directory page
+
+
+--------------------------------------------------------------------------------
+1. ROUTES — HOW A USER REACHES A DOCUMENT
+--------------------------------------------------------------------------------
+There are three ways into a legal document, all ending at the same renderer.
+
+1a. Canonical dynamic route:  /legal/[slug]
+    File: app/legal/[slug]/page.tsx
+    - Reads `slug` from the URL params.
+    - Delegates to the shared shell: <LegalDocumentPage slug={slug} />.
+    - Also exports generateMetadata() -> generateLegalMetadata(slug) for SEO.
+
+1b. Friendly redirect routes:  /privacy, /terms, /dpa
+    Files: app/privacy/page.tsx, app/terms/page.tsx, app/dpa/page.tsx
+    - These do NOT render anything themselves.
+    - They call redirectToLegalDocument(docType, fallbackSlug)
+      (app/legal/redirect-to-document.ts), which:
+        * Looks up the newest published doc of that docType via
+          fetchLegalDocumentSlugByDocType() (list endpoint, limit 1,
+          sort "-publishedAt").
+        * Falls back to a hard-coded slug (e.g. "privacy-policy") if the API
+          returns nothing.
+        * Issues a server redirect() to /legal/<slug>, or notFound() if neither
+          a live slug nor a fallback exists.
+    - Net effect: /privacy always resolves to the latest live privacy policy
+      document, then renders through the same shell + renderer as 1a.
+
+1c. The index page:  /legal
+    File: app/legal/page.tsx (covered in section 6).
+
+There is also a PDF download endpoint, /legal/[slug]/download (section 7).
+
+
+--------------------------------------------------------------------------------
+2. DATA MODEL — WHAT A "DOCUMENT" AND A "BLOCK" LOOK LIKE
+--------------------------------------------------------------------------------
+Defined in app/util/legal.ts.
+
+LegalDocumentPublicOut (the full detail payload the page renders):
+    id, slug, title, docType, summary, version,
+    effectiveAt, publishedAt, lastUpdated   (numbers = unix timestamps or null)
+    sourceFileUrl                           (string | null; short-lived PDF URL)
+    body: LegalBlock[]                       (the actual content to render)
+
+LegalBlock (one node in the content tree):
+    id?:        string
+    type:       string                       (e.g. "paragraph", "heading", ...)
+    props?:     Record<string, unknown>      (e.g. { level: 2 } for headings)
+    content?:   LegalInlineContent[] | Record | string | null
+    children?:  LegalBlock[]                  (nested blocks — recursion point)
+
+LegalInlineContent (what lives inside content, the inline run model):
+    - a plain string, OR
+    - LegalInlineText  = { type:"text", text, styles?:{bold,italic,underline,
+                                                        strike,code} }
+    - LegalInlineLink  = { type:"link", href?, content?:LegalInlineContent[] }
+
+Key idea: BLOCKS are the vertical layout (paragraphs, headings, lists, tables);
+INLINE CONTENT is the horizontal run inside a block (styled spans + links).
+Two different renderers handle each (sections 4 and 5).
+
+
+--------------------------------------------------------------------------------
+3. FETCHING — HOW THE DOCUMENT JSON ARRIVES
+--------------------------------------------------------------------------------
+Defined in app/util/legal.ts; endpoints in app/util/api.ts.
+
+Endpoints (LEGAL_ENDPOINTS):
+    list:   `${API_LEGACY_V1}/legal`
+    detail: `${API_LEGACY_V1}/legal/${encodeURIComponent(slug)}`
+
+fetchLegalDocument(slug):
+    - Calls the detail endpoint with `cache: "no-store"` (ALWAYS uncached).
+      Reason: the payload can include a short-lived `sourceFileUrl` for the
+      original upload, which must not be cached.
+    - 404  -> returns null  (page then calls notFound()).
+    - other non-OK -> throws (page catches and shows the "Unavailable" state).
+    - Unwraps an optional `{ data: ... }` envelope, normalises the row, and
+      coerces `body` into a LegalBlock[] (defaults to [] if missing/!array).
+
+fetchLegalDocuments(options) (list, used by /legal and the redirects):
+    - Supports skip/limit/sort/q/docType/facets query params.
+    - Cached: in dev `no-store`; in prod `next: { revalidate: 300 }` (5 min).
+    - Tolerant parsing: accepts {data:{items,meta}}, {items,meta}, or a bare
+      array; normalises every row and drops malformed ones.
+
+Robustness note: all field reads go through isRecord/asString/asNumber guards,
+so a malformed API response degrades gracefully rather than crashing render.
+
+
+--------------------------------------------------------------------------------
+4. THE PAGE SHELL — STYLING THE FRAME AROUND THE BODY
+--------------------------------------------------------------------------------
+File: app/legal/legal-page-shell.tsx  (default export LegalDocumentPage).
+
+This server component builds everything EXCEPT the body content. Layout:
+
+  <main class="min-h-screen bg-white">
+
+  (A) HERO / HEADER SECTION
+      <section> classes:
+        relative overflow-hidden border-b border-[#e8e8e8] bg-white
+        pt-[124px] pb-12  md:pt-[140px]
+      - The big top padding (124px / 140px) clears the fixed marketing header.
+      - A subtle grid texture overlay sits behind the text:
+          absolute inset-0 opacity-[0.035]
+          backgroundImage: two linear-gradients (1px #2a2a2a lines)
+          backgroundSize: 32px 32px
+          pointer-events-none  (purely decorative)
+      - Inner container: relative mx-auto max-w-[800px] px-6
+        (NOTE: 800px max width — narrower than the index page's max-w-6xl —
+         this is the reading column width and it matches the body column.)
+
+      Header contents, top to bottom:
+        * "Back to legal documents" link (top):
+            text-[13px] font-medium text-[#3A9615]
+            hover:text-[#2e7a11]
+        * Doc-type eyebrow label:
+            text-xs font-semibold uppercase tracking-widest text-[#3A9615]
+            text via legalDocTypeLabel(document.docType)
+        * Title <h1>:
+            font-serif text-[38px] md:text-[54px]
+            font-semibold leading-tight tracking-[-0.02em] text-[#1a1a1a]
+        * Summary <p> (only if document.summary):
+            mt-5 max-w-[680px] text-[15.5px] leading-relaxed text-[#6a6a6a]
+        * Meta pills row (mt-7, flex flex-wrap gap-3, text-[12.5px] #6a6a6a):
+            Rendered by MetaPill() for each present value:
+              Effective / Published / Updated / Version
+            MetaPill style:
+              inline-flex rounded-full border border-[#e8e8e8] bg-[#fafafa]
+              px-3 py-1; label part is font-semibold text-[#4a4a4a].
+            Dates formatted via formatLegalDate -> formatDateShort.
+        * "Download PDF" pill (only if document.sourceFileUrl):
+            mt-7 inline-flex items-center gap-2 rounded-full
+            border border-[#e8e8e8] bg-white px-4 py-2.5
+            text-[13.5px] font-medium text-[#2a2a2a] shadow-sm
+            hover:border-[#d8d8d8] hover:shadow-md
+            Icon: <FileDown> h-4 w-4 text-[#3A9615]
+            Links to /legal/<slug>/download with prefetch={false}.
+
+  (B) BODY / ARTICLE SECTION
+      <article> classes:
+        mx-auto max-w-[800px] px-6 py-14 md:py-16
+      - Same 800px reading column as the hero, so title and body align.
+      - If document.body.length > 0:  <LegalBlockRenderer blocks={body}/>
+        (the entire styled-content pipeline — section 5).
+      - Else: a fallback <p> ("published, but its body is currently empty"),
+        text-[15px] leading-relaxed text-[#6a6a6a].
+      - Footer: a top-bordered "Back to legal documents" link
+        (mt-16 border-t border-[#e8e8e8] pt-8; link text-[14px] #3A9615).
+
+  (C) ERROR / UNAVAILABLE STATE  (LegalUnavailable())
+      Shown when fetchLegalDocument throws (network/5xx). A centered message
+      with a serif headline and a green gradient CTA back to /legal:
+        bg-gradient-to-b from-[#43aa1a] to-[#2e7a11] ... text-white.
+      (Distinct from notFound(), which is triggered when the doc is null/404.)
+
+  (D) METADATA  (generateLegalMetadata())
+      Builds Next.js Metadata: title, description (document.summary or a
+      generated fallback), canonical /legal/<slug>, OpenGraph (type "article",
+      share image /visichek-social-share.svg, 1200x630), and Twitter summary
+      card. If the doc is missing it returns noindex metadata; on error it
+      returns a generic fallback.
+
+
+--------------------------------------------------------------------------------
+5. THE BODY RENDERER — HOW EACH BLOCK GETS ITS STYLE  (THE CORE)
+--------------------------------------------------------------------------------
+File: app/legal/legal-block-renderer.tsx
+Default export: LegalBlockRenderer({ blocks }).
+
+5.0  OUTER WRAPPER (the typographic baseline for ALL body text)
+     The whole body is wrapped in:
+        <div class="space-y-5 text-[15.5px] leading-[1.85] text-[#4a4a4a]">
+     - space-y-5      : vertical rhythm between top-level blocks (~20px).
+     - text-[15.5px]  : base body font size.
+     - leading-[1.85] : generous line-height for legal readability.
+     - text-[#4a4a4a] : default body text color (soft near-black).
+     Every block below inherits this unless it overrides color/size.
+
+5.1  THE WALK — renderBlocks(blocks)
+     A while-loop index walk (NOT a simple .map) because consecutive list-item
+     blocks must be GROUPED into a single <ul>/<ol>:
+       - When it sees a "bulletListItem" or "numberedListItem", it greedily
+         consumes ALL adjacent items of the SAME type into one list element.
+       - Everything else is handed to renderBlock() individually.
+     Each child gets a stable React key from blockKey(): block.id, else
+     `${type}-${index}`.
+
+5.2  LISTS  (grouped in renderBlocks)
+     Container tag: <ul> for bullets, <ol> for numbered.
+     Classes:
+        bullets:  my-5 list-disc    space-y-2.5 pl-6 marker:text-[#3A9615]
+        numbers:  my-5 list-decimal space-y-2.5 pl-6 marker:text-[#3A9615]
+     - marker:text-[#3A9615] makes bullets/numbers brand green.
+     - pl-6 indents the list; space-y-2.5 spaces items.
+     Each <li class="pl-1">:
+        * renders its inline content (section 5.8), then
+        * if item.children exist, renders them in a nested
+          <div class="mt-3">{renderBlocks(children)}</div>  --> RECURSION,
+          which is how nested/sub-lists and nested blocks appear.
+
+5.3  HEADINGS  (renderHeading)
+     Level comes from block.props.level (number); defaults to 2 if absent.
+     Shared classes for every heading:
+        mt-10 mb-3 font-serif font-semibold tracking-[-0.01em] text-[#1a1a1a]
+     - font-serif => the marketing serif (see section 8), so headings visually
+       match the page title.
+     - Big mt-10 top margin creates clear section breaks.
+     Size by level:
+        level <= 1 :  <h2> text-[28px] leading-tight
+        level == 2 :  <h2> text-[24px] leading-tight
+        level == 3 :  <h3> text-[20px] leading-snug
+        level >= 4 :  <h4> text-[17px] leading-snug
+     NOTE: level 1 is intentionally rendered as <h2>, not <h1>, because the
+     page's single <h1> is the document title in the hero. This keeps a correct
+     document outline (one h1 per page) for accessibility/SEO.
+
+5.4  PARAGRAPH
+        <p class="my-4">{inline content}{child blocks}</p>
+     my-4 vertical margin; inherits the 15.5px / 1.85 / #4a4a4a baseline.
+
+5.5  QUOTE (blockquote)
+        my-6 border-l-4 border-[#3A9615] bg-[#f8fbf8]
+        py-3 pl-5 pr-4 text-[#2a2a2a]
+     A green left rule + very light green tint background — the brand "callout."
+
+5.6  CODE BLOCK (pre/code)
+        my-6 overflow-x-auto rounded-xl border border-[#e8e8e8]
+        bg-[#1a1a1a] p-4 text-[13px] leading-relaxed text-white
+     Dark terminal-style block; content rendered as plainText() (strips inline
+     styling/links down to raw text, so code shows verbatim).
+
+5.7  OTHER BLOCK TYPES
+     divider:  <hr class="my-10 border-[#e8e8e8]">  (a faint full-width rule).
+     image:    renderImage() — figure with:
+                 <img class="w-full rounded-xl border border-[#e8e8e8]
+                              bg-[#fafafa]"> ; alt = caption or "".
+               Optional <figcaption class="mt-2 text-center text-[12.5px]
+                              text-[#6a6a6a]">.
+               Returns null (renders nothing) if there's no url.
+               (eslint no-img-element is disabled at file top because these are
+                arbitrary external CMS URLs, not next/image assets.)
+     table:    renderTable() — see 5.9.
+     DEFAULT (unknown type): a safe fallback
+                 <div class="my-4">{inline content}{child blocks}</div>
+               so an unrecognised block type still shows its text instead of
+               disappearing.
+
+5.8  INLINE CONTENT — styling runs WITHIN a block
+     renderInlineContent(content):
+        - string  -> renderTextWithBreaks (see below).
+        - array   -> maps each node through renderInlineNode.
+        - anything else -> null.
+     renderInlineNode handles three shapes:
+        (a) plain string  -> renderTextWithBreaks.
+        (b) link  (type:"link"):
+              <a> classes:
+                font-medium text-[#2e7a11] underline
+                decoration-[#3A9615]/30 underline-offset-4
+                transition-colors hover:text-[#25660e]
+              href passes through safeHref() (section 5.10).
+              External (http) links get target="_blank" rel="noreferrer";
+              internal (/ or #) links do not.
+              Link text is itself rendered via renderInlineContent (recursion),
+              so links can contain styled runs.
+        (c) text  (type:"text"):
+              text is run through renderTextWithBreaks, then wrapped by
+              applyTextStyles() according to its `styles` flags.
+
+     applyTextStyles() — the inline mark styling, applied in this order
+     (so they nest/compose):
+        code      -> <code class="rounded bg-[#f2f8f0] px-1.5 py-0.5
+                                   font-mono text-[0.9em] text-[#1f4d0f]">
+                     (light-green inline code chip).
+        bold      -> <strong class="font-semibold text-[#2a2a2a]">
+        italic    -> <em>
+        underline -> <span class="underline underline-offset-4">
+        strike    -> <span class="line-through">
+     Multiple flags stack by wrapping the previous output.
+
+     renderTextWithBreaks(text):
+        Splits the string on "\n" and inserts <br/> between parts, so literal
+        newlines inside a single text run become visible line breaks.
+
+5.9  TABLES  (renderTable + helpers)
+     The CMS table shape is messy, so several shapes are tolerated:
+        getTableRows()  looks for rows at content.rows, inside a content array
+                        item that has .rows, or props.rows.
+        getTableCells() accepts a row that is an array, or {cells:[...]}.
+        renderTableCell() accepts a string, an inline-content array, a
+                        {content:...} cell, or a {children:[...]} cell (which
+                        recurses back into renderBlocks — full blocks in a cell).
+     If no rows are found, it degrades to a plain
+        <div class="my-4">{inline content}</div>.
+     When rows exist:
+        Wrapper: my-8 overflow-x-auto rounded-xl border border-[#e8e8e8]
+                 (rounded card with horizontal scroll on small screens).
+        <table>: w-full min-w-[560px] border-collapse text-left text-[14px]
+        <tr>:    border-b border-[#e8e8e8] last:border-b-0
+        <td>:    align-top border-r border-[#e8e8e8] px-4 py-3 last:border-r-0
+     There is NO distinct <thead>/header-cell styling — every row uses the same
+     <td> treatment (the renderer emits a single <tbody>).
+
+5.10 LINK SAFETY  (safeHref)
+     - Empty/non-string -> "#".
+     - Starts with "/" or "#" -> kept (internal link/anchor).
+     - Otherwise parsed as a URL; only http/https/mailto/tel protocols are
+       allowed, anything else (e.g. javascript:) -> "#".
+     This sanitises CMS-authored links against injection.
+
+
+--------------------------------------------------------------------------------
+6. THE INDEX PAGE — /legal  (the directory of documents)
+--------------------------------------------------------------------------------
+File: app/legal/page.tsx.  Server component, `export const revalidate = 300`.
+
+- Fetches up to 100 docs: fetchLegalDocuments({ limit:100, sort:"title",
+  facets:"doc_type" }).
+- Hero section: same grid-texture pattern as the document shell, but a WIDER
+  container (mx-auto max-w-6xl px-6, vs the document's max-w-[800px]).
+    Eyebrow "Legal" (green uppercase), <h1> font-serif text-[40px] md:text-[58px].
+- Cards grid: grid gap-4 md:grid-cols-2. Each card is a <Link> to
+  /legal/<slug>:
+    group flex min-h-[210px] flex-col rounded-2xl border border-[#e8e8e8]
+    bg-white p-6 ... hover:-translate-y-0.5 hover:border-[#d8d8d8]
+    hover:shadow-[0_10px_36px_rgba(0,0,0,0.06)]
+  Card internals:
+    * Doc-type chip: rounded-full border bg-[#fafafa] px-3 py-1 text-[11px]
+      font-semibold uppercase tracking-[0.08em] text-[#2e7a11].
+    * <ChevronRight> that nudges right on group hover.
+    * Title <h2> font-serif text-[24px] font-semibold.
+    * Summary <p> mt-3 line-clamp-3 text-[14px] text-[#6a6a6a] (truncated to 3
+      lines).
+    * Meta row pinned to the bottom (mt-auto): Effective / Published / Version,
+      text-[12px] #6a6a6a.
+- Empty state: a dashed-border card ("No legal documents are published yet.").
+
+
+--------------------------------------------------------------------------------
+7. PDF DOWNLOAD ROUTE — /legal/[slug]/download
+--------------------------------------------------------------------------------
+File: app/legal/[slug]/download/route.ts.  A Next.js Route Handler (GET).
+- Re-fetches the document, reads its (short-lived) sourceFileUrl.
+- If present: 302 redirect to that URL, Cache-Control: no-store.
+- If absent: 404 ("No source file is available for this document.").
+- On fetch error: 502 ("The source file could not be loaded.").
+This is why the shell only shows the "Download PDF" pill when sourceFileUrl is
+present, and why the link uses prefetch={false} (avoids burning the short-lived
+URL on hover-prefetch).
+
+
+--------------------------------------------------------------------------------
+8. FONTS & THE "marketing-shell" REQUIREMENT (important gotcha)
+--------------------------------------------------------------------------------
+Headings and titles use the Tailwind class `font-serif`. That class only maps to
+the brand serif via a SCOPED CSS rule in app/globals.css:
+
+    .marketing-shell .font-serif { font-family: var(--font-marketing-serif); }
+
+where --font-marketing-serif = "moderat-serif" (loaded in app/layout.tsx) with
+fallbacks ui-serif, Georgia, serif.
+
+The legal pages get that serif ONLY because they render inside the
+`.marketing-shell` wrapper applied by app/components/chrome-router.tsx:
+- ChromeRouter wraps every route in <div class="marketing-shell ..."> EXCEPT
+  routes under /videos (the dark "content" chrome).
+- /legal, /legal/[slug], /privacy, /terms, /dpa are all non-/videos, so they
+  receive the marketing shell, the marketing sans body font, and the working
+  `font-serif` for headings.
+Takeaway: if a legal page were ever moved under /videos (or otherwise outside
+.marketing-shell), `font-serif` would silently fall back to ui-serif/Georgia.
+
+
+--------------------------------------------------------------------------------
+9. COLOR & SIZE QUICK-REFERENCE (the legal "design tokens", inlined as classes)
+--------------------------------------------------------------------------------
+There are no CSS variables for these; they are repeated Tailwind arbitrary
+values. To re-theme, search/replace these across the three legal files.
+
+  Brand green (primary):       #3A9615   (markers, icons, eyebrows, quote rule)
+  Green link / chip text:      #2e7a11
+  Green link hover:            #25660e
+  Inline-code green text:      #1f4d0f
+  Inline-code green bg:        #f2f8f0
+  Quote tint background:       #f8fbf8
+  Heading / title text:        #1a1a1a
+  Strong / quote / table text: #2a2a2a
+  Body text (baseline):        #4a4a4a
+  Meta-label text:             #4a4a4a
+  Muted text (summary/meta):   #6a6a6a
+  Border / hairlines:          #e8e8e8  (hover #d8d8d8)
+  Neutral fill:                #fafafa
+  Code-block background:       #1a1a1a  (white text)
+
+  Body baseline:   text-[15.5px] leading-[1.85]
+  Reading column:  max-w-[800px] (document) / max-w-6xl (index)
+  Block rhythm:    space-y-5 outer; per-block my-4 (p) / my-5 (lists) /
+                   my-6 (quote, code) / my-8 (image, table) / my-10 (divider)
+  Heading sizes:   28 / 24 / 20 / 17 px (levels 1>4)
+
+
+--------------------------------------------------------------------------------
+10. HOW TO MAKE COMMON CHANGES
+--------------------------------------------------------------------------------
+- Change body font size / line spacing:
+    Edit the outer wrapper in legal-block-renderer.tsx (section 5.0).
+- Restyle a block type (e.g. quotes, tables, code):
+    Edit that case in renderBlock()/renderTable() etc. (section 5).
+- Add support for a NEW block type:
+    Add a `case "<type>":` in renderBlock(); until then it falls through to the
+    safe default <div> (5.7).
+- Add a new inline mark (e.g. highlight):
+    Add a branch in applyTextStyles() and the flag to LegalInlineText.styles in
+    app/util/legal.ts.
+- Change heading -> tag mapping or sizes:
+    Edit renderHeading() (5.3). Remember level 1 maps to <h2> on purpose.
+- Re-theme the brand green:
+    Replace #3A9615 / #2e7a11 / #25660e across the three legal files (section 9).
+- Change the reading column width:
+    Update max-w-[800px] in BOTH the hero <div> and the <article> in
+    legal-page-shell.tsx so the title and body stay aligned.
+
+
+--------------------------------------------------------------------------------
+11. FILE MAP (where everything lives)
+--------------------------------------------------------------------------------
+  app/legal/legal-block-renderer.tsx  Body renderer + ALL block/inline styling.
+  app/legal/legal-page-shell.tsx      Page frame: hero, title, meta, download,
+                                       error state, SEO metadata.
+  app/legal/[slug]/page.tsx           Canonical dynamic route entry.
+  app/legal/[slug]/download/route.ts  PDF redirect handler.
+  app/legal/page.tsx                  /legal index (cards grid).
+  app/legal/redirect-to-document.ts   /privacy,/terms,/dpa -> latest slug.
+  app/privacy|terms|dpa/page.tsx      Thin redirect pages.
+  app/util/legal.ts                   Types, fetchers, doc-type labels.
+  app/util/api.ts                     LEGAL_ENDPOINTS (list/detail URLs).
+  app/util/date.ts                    formatDateShort (meta dates).
+  app/globals.css                     .marketing-shell font-serif mapping.
+  app/components/chrome-router.tsx    Applies .marketing-shell to legal routes.
+  app/layout.tsx                      Loads the moderat-serif brand font.
+================================================================================
