@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import OpenGetStartedButton from "./open-sales-button";
 import type {
+  PricingAddon,
   PricingMarketingPayload,
   PricingPlan,
   PricingTier,
@@ -111,7 +112,11 @@ interface Props {
 
 export default function MarketingPricingSection({ payload }: Props) {
   const [billing, setBilling] = useState<Billing>("monthly");
-  const { plans, sections, headline, subheadline } = payload;
+  const { plans, sections, headline, subheadline, addons } = payload;
+  const visibleAddons = useMemo(
+    () => (addons ?? []).filter((a) => a.visible),
+    [addons],
+  );
 
   const hasYearly = useMemo(
     () => plans.some((p) => p.priceYearly != null),
@@ -188,6 +193,7 @@ export default function MarketingPricingSection({ payload }: Props) {
                 key={plan.planName}
                 plan={plan}
                 billing={billing}
+                addons={visibleAddons}
               />
             ))}
           </div>
@@ -209,6 +215,11 @@ export default function MarketingPricingSection({ payload }: Props) {
                 Pick the plan that matches your facility&apos;s scale and security
                 workflow.
               </p>
+              {visibleAddons.length > 0 && (
+                <p className="text-[13px] text-[#6a6a6a] mt-4 bg-[#f3f3f3] border border-[#e8e8e8] rounded-md px-3.5 py-2.5">
+                  {visibleAddons.map((a) => a.blurb || a.name).join(" ")}
+                </p>
+              )}
             </div>
 
             <ComparisonTable plans={plans} sections={sections} billing={billing} />
@@ -251,8 +262,21 @@ function BillingToggleButton({
   );
 }
 
-function PlanColumn({ plan, billing }: { plan: PricingPlan; billing: Billing }) {
+function PlanColumn({
+  plan,
+  billing,
+  addons,
+}: {
+  plan: PricingPlan;
+  billing: Billing;
+  addons: PricingAddon[];
+}) {
   const theme = themeFor(plan.tier);
+  // Add-ons render only under the plan they require — matched by tier
+  // since the requiring plan's slug can vary (canonical "premium" vs
+  // marketing copy like "advanced") while its tier stays stable.
+  const isPremiumCard = String(plan.tier).toLowerCase() === "premium";
+  const planAddons = addons.filter((a) => isPremiumCard && a.slug);
   const price = priceLabel(plan, billing);
   const suffix = priceSuffix(plan, billing);
   const saving = billing === "yearly" ? yearlySaving(plan) : null;
@@ -339,7 +363,36 @@ function PlanColumn({ plan, billing }: { plan: PricingPlan; billing: Billing }) 
             ))}
           </ul>
         )}
+        {planAddons.length > 0 && (
+          <div className="mt-5 pt-5 border-t border-dashed border-[#e0e0e0] space-y-3">
+            {planAddons.map((addon) => (
+              <AddonNote key={addon.slug} addon={addon} />
+            ))}
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Marketing note for a purchasable add-on (eg "Additional branch"),
+ * rendered under the plan card it applies to. Price is optional —
+ * when the payload doesn't resolve one (eg the fallback snapshot) we
+ * point the visitor to checkout instead of guessing a number.
+ */
+function AddonNote({ addon }: { addon: PricingAddon }) {
+  return (
+    <div className="rounded-lg bg-[#faf7ff] border border-[#3b0e74]/10 px-3.5 py-3">
+      <p className="text-[11px] font-semibold text-[#3b0e74] uppercase tracking-[0.06em] mb-1">
+        Add-on · {addon.name}
+      </p>
+      <p className="text-[12.5px] text-[#3a3a3a] leading-snug">{addon.blurb}</p>
+      <p className="text-[12px] text-[#6a6a6a] mt-1.5">
+        {addon.priceMonthly != null
+          ? `${formatPlanPrice(addon.priceMonthly, addon.currency)}/mo per branch`
+          : "Priced at checkout"}
+      </p>
     </div>
   );
 }

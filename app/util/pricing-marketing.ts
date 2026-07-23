@@ -54,12 +54,24 @@ export interface PricingSection {
   rows: PricingRow[];
 }
 
+export interface PricingAddon {
+  slug: string;
+  name: string;
+  blurb?: string | null;
+  priceMonthly: number | null;
+  currency: string;
+  // Plan slug required to purchase (eg "premium"), null if unrestricted.
+  requiresPlan?: string | null;
+  visible: boolean;
+}
+
 export interface PricingMarketingPayload {
   headline: string;
   subheadline: string;
   currency: string;
   plans: PricingPlan[];
   sections: PricingSection[];
+  addons: PricingAddon[];
   lastUpdated?: number;
 }
 
@@ -111,6 +123,7 @@ function normalisePayload(raw: unknown): PricingMarketingPayload {
     currency: (p.currency as string) || "NGN",
     plans: (p.plans as PricingPlan[]) ?? [],
     sections: (p.sections as PricingSection[]) ?? [],
+    addons: Array.isArray(p.addons) ? (p.addons as PricingAddon[]) : [],
     lastUpdated:
       typeof p.lastUpdated === "number" ? (p.lastUpdated as number) : undefined,
   };
@@ -193,6 +206,18 @@ export const DEFAULT_PRICING_PAYLOAD: PricingMarketingPayload = {
   subheadline:
     "Scales with locations, departments, rollout needs, and the security workflow you need on day one.",
   currency: "NGN",
+  addons: [
+    {
+      slug: "additional-branch",
+      name: "Additional branch",
+      blurb:
+        "Extra branches — 20% off Premium, each with its own 1,000 new visitors/month.",
+      priceMonthly: null,
+      currency: "NGN",
+      requiresPlan: "advanced",
+      visible: true,
+    },
+  ],
   plans: [
     {
       planName: "basic",
