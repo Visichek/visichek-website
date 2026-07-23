@@ -262,6 +262,26 @@ function BillingToggleButton({
   );
 }
 
+/**
+ * Whether an addon should be attached to a given plan card.
+ *
+ * - `requiresPlan == null` → unrestricted; attach to the premium card
+ *   (today's sensible default for a single-addon catalog).
+ * - Otherwise match `requiresPlan` against either the plan's slug
+ *   (backend emits the canonical plan slug, eg "premium") or its tier
+ *   (the fallback payload uses tier "premium" on slug "advanced").
+ */
+function addonAppliesToPlan(addon: PricingAddon, plan: PricingPlan): boolean {
+  if (!addon.slug) return false;
+  const isPremiumCard = String(plan.tier).toLowerCase() === "premium";
+  if (addon.requiresPlan == null) return isPremiumCard;
+  const requires = addon.requiresPlan.toLowerCase();
+  return (
+    requires === plan.planName.toLowerCase() ||
+    requires === String(plan.tier).toLowerCase()
+  );
+}
+
 function PlanColumn({
   plan,
   billing,
@@ -272,11 +292,14 @@ function PlanColumn({
   addons: PricingAddon[];
 }) {
   const theme = themeFor(plan.tier);
-  // Add-ons render only under the plan they require — matched by tier
-  // since the requiring plan's slug can vary (canonical "premium" vs
-  // marketing copy like "advanced") while its tier stays stable.
-  const isPremiumCard = String(plan.tier).toLowerCase() === "premium";
-  const planAddons = addons.filter((a) => isPremiumCard && a.slug);
+  // Add-ons render only under the plan(s) they require. `requiresPlan`
+  // may hold either the canonical plan slug the backend emits (eg
+  // "premium") or the marketing-copy slug the fallback payload uses
+  // (eg "advanced", whose tier is "premium") — so match on both the
+  // plan's slug and its tier. An addon with no requiresPlan is
+  // unrestricted; today's sensible default is to still surface it on
+  // the premium card, since that's where paid add-ons are relevant.
+  const planAddons = addons.filter((a) => addonAppliesToPlan(a, plan));
   const price = priceLabel(plan, billing);
   const suffix = priceSuffix(plan, billing);
   const saving = billing === "yearly" ? yearlySaving(plan) : null;
