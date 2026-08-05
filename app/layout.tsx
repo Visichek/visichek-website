@@ -11,6 +11,7 @@ import ChromeRouter from "./components/chrome-router";
 import MarketingHeader from "./components/marketing-header";
 import MarketingFooter from "./components/marketing-footer";
 import SmoothScroll from "@/components/ui/smooth-scroll";
+import { fetchLegalDocumentHrefByDocType } from "./util/legal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -223,11 +224,18 @@ const structuredData = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Resolved here so the footer ships with a real document URL in the markup.
+  // Cached upstream (5 min revalidate), so this is a cache read on the hot
+  // path rather than a per-request round trip. `null` -> the footer omits the
+  // link entirely.
+  const privacyPolicyHref =
+    await fetchLegalDocumentHrefByDocType("privacy_policy");
+
   return (
     <html
       lang="en"
@@ -270,7 +278,9 @@ export default function RootLayout({
             contentHeader={<Header />}
             contentFooter={<Footer />}
             marketingHeader={<MarketingHeader />}
-            marketingFooter={<MarketingFooter />}
+            marketingFooter={
+              <MarketingFooter privacyPolicyHref={privacyPolicyHref} />
+            }
           >
             <AnimatedPage>{children}</AnimatedPage>
           </ChromeRouter>

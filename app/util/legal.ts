@@ -7,6 +7,8 @@
  * short-lived `sourceFileUrl` for the original upload.
  */
 
+import { cache } from "react";
+
 import { LEGAL_ENDPOINTS } from "./api";
 
 export type LegalDocType =
@@ -271,3 +273,24 @@ export async function fetchLegalDocumentSlugByDocType(
 
   return result?.items[0]?.slug ?? null;
 }
+
+/**
+ * Resolve the canonical `/legal/<slug>` href for a document type at render
+ * time, so links can be baked into the markup instead of pointing at a
+ * redirect the browser has to follow on click.
+ *
+ * Returns `null` when no such document is published — or when the API is
+ * unreachable, since `fetchLegalDocuments` swallows transport errors. Callers
+ * MUST treat `null` as "omit the link entirely" rather than falling back to a
+ * guessed slug: a link to a document that isn't published is a 404, and a
+ * 404'd privacy policy is worse than no link at all.
+ *
+ * Wrapped in React `cache` so several surfaces in one render (footer, header,
+ * a legal index) share a single upstream request.
+ */
+export const fetchLegalDocumentHrefByDocType = cache(
+  async (docType: LegalDocType): Promise<string | null> => {
+    const slug = await fetchLegalDocumentSlugByDocType(docType);
+    return slug ? `/legal/${slug}` : null;
+  },
+);
