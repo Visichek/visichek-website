@@ -198,7 +198,18 @@ const countrySelectStyles = {
   }),
 };
 
-export default function MarketingFooter() {
+interface MarketingFooterProps {
+  /**
+   * Resolved at render time by the server layout. `null` means no privacy
+   * policy is currently published (or the legal API was unreachable), in
+   * which case the link is omitted rather than pointed at a guessed slug.
+   */
+  privacyPolicyHref?: string | null;
+}
+
+export default function MarketingFooter({
+  privacyPolicyHref = null,
+}: MarketingFooterProps = {}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
@@ -552,14 +563,16 @@ export default function MarketingFooter() {
                     Legal documents
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/privacy"
-                    className="hover:text-charcoal transition-colors"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
+                {privacyPolicyHref ? (
+                  <li>
+                    <Link
+                      href={privacyPolicyHref}
+                      className="hover:text-charcoal transition-colors"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </li>
+                ) : null}
                 <li>
                   <Link
                     href="/terms"
