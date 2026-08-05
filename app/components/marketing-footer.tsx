@@ -554,7 +554,7 @@ export default function MarketingFooter() {
                 </li>
                 <li>
                   <Link
-                    href="/privacy"
+                    href="/legal/privacy-policy"
                     className="hover:text-charcoal transition-colors"
                   >
                     Privacy Policy
